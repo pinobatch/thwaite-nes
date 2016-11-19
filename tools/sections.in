@@ -1,0 +1,234 @@
+[Cutscene graphics]
+cutscene_pkb
+cutscene_init_oam
+cutscene_init_oam_end
+cutscene_palette
+
+[Cutscene scripts]
+cutscene_palette
+cut_scripts
+default_script
+discover_clue_1
+discover_clue_2
+discover_clue_3
+end_script
+enter_poor_1
+enter_poor_2
+perfect_fri_script
+perfect_mon_script
+perfect_next_week_script
+perfect_sat_script
+perfect_sun_script
+perfect_thu_script
+perfect_tue_script
+perfect_wed_script
+
+[Cutscene states]
+cut_handle_state
+cut_handle_state::handlers
+cut_handle_state_cls
+cut_handle_state_new_graph
+cut_handle_state_script
+cut_handle_state_wait_a
+cut_translate_actorid
+
+[Villager names]
+character_name_offset
+character_name0
+character_name1
+character_name2
+character_name3
+character_name4
+character_name5
+character_name6
+character_name7
+character_name8
+character_name9
+character_name10
+character_name11
+character_name12
+character_name13
+character_name14
+
+[Villager casting]
+cut_choose_villagers
+laidback_characters
+detective_characters
+paranoid_characters
+character_sex
+
+[Start new level]
+doStateNewLevel
+doStateNewLevel::hourlyMusic
+initRandomTarget
+levelTips
+loadLevel
+levelTable
+
+[HW init]
+init_sound
+getTVSystem
+
+[Background update scheduler]
+buildBGUpdate
+buildStatusBar
+buildPracticeMeterBar
+
+[buildTipBar]
+; this helps until I fix a bug in the scope resolver
+buildTipBar::buildTipBar::suffix
+
+[Tip data]
+tipTexts
+tipBalloonFever1
+tipBothSilos
+tipGameOver
+tipNiceJob
+tipNone
+tipNova
+tipPathsCross
+tipPayload
+tipRebuildHouse
+tipRebuildSilo
+tipRebuilt
+tipSun1
+tipTopToBottom
+tipTwoPlayer
+tipWreckage
+
+[Game state machine]
+doStateAction
+stateHandlers
+doStateInactive
+doStateRebuildSilo
+doStateGameOver
+
+[Title screen]
+titleScreen
+title_draw_sprites
+mouse_icon_x
+mouse_change_sensitivity
+title_move_numPlayers
+title_pkb
+
+[Practice menu]
+practice_menu
+practiceDoClick
+practiceSetSide
+practice_txt
+drawPracticeMenuSprites
+
+[Crosshair physics]
+moveCrosshairPlayerX
+accelBrakeLimit
+crosshairAccels
+crosshairMaxVelHi
+crosshairMaxVelLo
+
+[Explosion logic]
+updateAllExplosions
+updateExplosionX
+explodeFrameStartTile
+explodeFrameTileSize
+missileCollisionHt
+explodeFrameRadiusSquared
+
+[Missile spawning]
+makeMissile
+makeBalloon
+chooseRandomTarget
+
+[Missile movement]
+moveMissileNumberX
+missileSine
+missileCosine
+makeSmoke
+splitBalloon
+handleMIRV
+
+[Missile drawing]
+drawMissileNumberX
+missileTileNumber
+missileTileHotspotY
+missileTileHotspotX
+missileTileFlip
+drawBalloonNumberX
+
+[Missile threats]
+testMissileThreats
+testMissileXThreat
+makeExcl
+
+[Villager movement]
+updateVillagers
+moveVillagers
+chooseNewTargetForX
+
+[Level reward]
+addScore
+villagersGoHome
+buildLevelRewardBar
+
+[Clear missiles, explosions, smoke]
+clearAllMissiles
+clearExplosions
+clearAllSmoke
+
+[Pently Sound Engine]
+start_sound
+update_sound
+update_music
+init_music
+stop_music
+durations
+update_music_ch
+update_one_ch
+fpmHi
+fpmLo
+silentPattern
+
+[Sound data]
+musicPatternTable
+cleared_sq1
+hr16_drums
+hr16_sq1
+hr16_sq2
+hr16_tri
+hr2_bass
+hr2_drums
+hr2_sq1
+hr2_sq2
+hr3_drums
+hr3_sq1_1
+hr3_sq2_1
+hr3_sq2_2
+hr3_tri_1
+hr3_tri_2
+hr4_drums
+hr4_drums_2
+hr4_sq1
+hr4_sq2
+hr5_melody
+hr5_sqloop
+hr5_triloop
+instrumentTable
+drumSFX
+psg_sound_table
+boom1_snd
+boom2_snd
+hihat_snd
+kick2_snd
+kick_snd
+mirv_split_snd
+shoot_snd
+snare2_snd
+snare_snd
+threat1_snd
+threat2_snd
+songTable
+cleared_conductor
+hr16_conductor
+hr2_conductor
+hr3_conductor
+hr4_conductor
+hr5_conductor
