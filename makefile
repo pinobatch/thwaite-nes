@@ -18,7 +18,8 @@ CC65 = /usr/local/bin
 AS65 = ca65
 LD65 = ld65
 #EMU := "/C/Program Files/nintendulator/Nintendulator.exe"
-EMU := mednafen -nes.pal 0 -nes.input.port1 gamepad -nes.input.port2 gamepad
+#EMU := mednafen -nes.pal 0 -nes.input.port1 gamepad -nes.input.port2 gamepad
+EMU := fceux
 CC = gcc
 ifdef COMSPEC
 DOTEXE=.exe
@@ -51,11 +52,16 @@ zip: thwaite-$(version).zip
 thwaite-$(version).zip: zip.in thwaite.nes README.html $(objdir)/index.txt
 	zip -9 -u $@ -@ < $<
 
+# Build zip.in from the list of files in the Git tree
+zip.in:
+	git ls-files | grep -e "^[^.]" > $@
+	echo zip.in >> $@
+
 # Some unzip tools won't create empty folders, so put a file there.
 $(objdir)/index.txt: makefile CHANGES.txt
 	echo Files produced by build tools go here, but caulk goes where? > $@
 
-$(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.h $(srcdir)/ram.h
+$(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/global.inc
 	$(AS65) $(CFLAGS65) $< -o $@
 
 $(objdir)/%.o: $(objdir)/%.s
@@ -71,7 +77,7 @@ $(objdir)/ntscPeriods.s: tools/mktables.py
 	$< period $@
 
 map.txt thwaite.prg: nes.ini $(objlistntsc)
-	$(LD65) -C $^ -m map.txt -o thwaite.prg
+	$(LD65) -o thwaite.prg -m map.txt -C $^
 
 $(objdir)/%.chr: $(imgdir)/%.png
 	tools/pilbmp2nes.py $< $@

@@ -26,7 +26,7 @@ MISSILE_SYMBOL_TILE = $AC
 HOUSE_SYMBOL_TILE = $7F
 .segment "RODATA"
 tipNova:
-  .byt "¯legal miss¯e count",10,"you l¯ cheater",0
+  .byt "",il,"legal miss",il,"e count",10,"you l",il," cheater",0
 
 levelTips:
   .byt  5, 6, 7, 8, 9
@@ -43,6 +43,8 @@ tipTexts:
   .addr tipNone, tipGameOver, tipNiceJob, tipRebuildSilo, tipRebuildHouse
   .addr tipSun1, tipBothSilos, tipPathsCross, tipPayload, tipRebuilt
   .addr tipTopToBottom, tipTwoPlayer, tipWreckage, tipNova, tipBalloonFever1
+  
+il = $AF
 
 ;length"There is a limit of 28      ",10,"characters per line.        ",0
 tipGameOver:
@@ -53,24 +55,24 @@ tipNiceJob:
   .byt "         Nice Job!",          10
   .byt "Left:  *",HOUSE_SYMBOL_TILE,"  *",MISSILE_SYMBOL_TILE,"   Bonus:    00",0
 tipRebuildSilo:
-  .byt "Repairs to the s¯o",          10,"are complete.",0
+  .byt "Repairs to the s",il,"o",          10,"are complete.",0
 tipRebuildHouse:
-  .byt "'s house has",                10,"been rebu¯t.",0
+  .byt "'s house has",                10,"been rebu",il,"t.",0
 tipSun1:
-  .byt "Shoot down incoming miss¯es", 10,"to defend the town!",0
+  .byt "Shoot down incoming miss",il,"es", 10,"to defend the town!",0
 tipBothSilos:
-  .byt "Shoot from both s¯os:",       10,"press B or A.",0
+  .byt "Shoot from both s",il,"os:",       10,"press B or A.",0
 tipTwoPlayer:
-  .byt "Each player's s¯o has",       10,"its own stock of ABMs.",0
+  .byt "Each player's s",il,"o has",       10,"its own stock of ABMs.",0
 tipPathsCross:
-  .byt "You can destroy two miss¯es", 10,"by aiming where paths cross.",0
+  .byt "You can destroy two miss",il,"es", 10,"by aiming where paths cross.",0
 tipPayload:
   .byt "Destroy balloons and MIRVs",  10,"before they drop a payload.",0
 tipRebuilt:
-  .byt "Survive unt¯ morning and",    10,"a house w¯l be rebu¯t.",0
+  .byt "Survive unt",il," morning and",    10,"a house w",il,"l be rebu",il,"t.",0
 tipTopToBottom:
   .byt "TIP: Start at the top",       10,"and progress to the bottom.",0
 tipWreckage:
-  .byt "Don't worry about miss¯es",   10,"that are aimed at wreckage.",0
+  .byt "Don't worry about miss",il,"es",   10,"that are aimed at wreckage.",0
 tipBalloonFever1:
   .byt "When you say ",34,"that's so gay",34,",",10,"do you realize what you say?",0

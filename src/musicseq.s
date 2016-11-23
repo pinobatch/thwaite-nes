@@ -10,7 +10,7 @@
 ; Unofficial translation:
 ; Go ahead and make your ReMixes, but credit me.
 
-.include "src/musicseq.h"
+.include "pentlyseq.inc"
 
 .segment "RODATA"
 
@@ -113,9 +113,9 @@ kick_snd:
   
 ; Each drum consists of one or two sound effects.
 drumSFX:
-  .byt 10, 2
-  .byt 1,  9
-  .byt 3, -1
+  .byt 10,   2
+  .byt  1,   9
+  .byt  3, $FF
 KICK  = 0*8
 SNARE = 1*8
 CLHAT = 2*8

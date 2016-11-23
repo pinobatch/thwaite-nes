@@ -1,31 +1,19 @@
 ; music.s
-; part of sound engine for LJ65, Concentration Room, and Thwaite
-
-;;; Copyright (C) 2009-2011 Damian Yerrick
+; Pently 0.03 sound engine
 ;
-;   This program is free software; you can redistribute it and/or
-;   modify it under the terms of the GNU General Public License
-;   as published by the Free Software Foundation; either version 3
-;   of the License, or (at your option) any later version.
+; Copyright 2010 Damian Yerrick
 ;
-;   This program is distributed in the hope that it will be useful,
-;   but WITHOUT ANY WARRANTY; without even the implied warranty of
-;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;   GNU General Public License for more details.
-;
-;   You should have received a copy of the GNU General Public License
-;   along with this program; if not, write to 
-;     Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;     Boston, MA  02111-1307, USA.
-;
-;   Visit http://www.pineight.com/ for more information.
+; Copying and distribution of this file, with or without
+; modification, are permitted in any medium without royalty provided
+; the copyright notice and this notice are preserved in all source
+; code copies.  This file is offered as-is, without any warranty.
 
 .importzp psg_sfx_state
 .import soundBSS
 .import start_sound
 .export music_playing
 .export init_music, stop_music, update_music, update_music_ch
-.include "src/musicseq.h"
+.include "pentlyseq.inc"
 
 .ifndef SOUND_NTSC_ONLY
 SOUND_NTSC_ONLY = 0

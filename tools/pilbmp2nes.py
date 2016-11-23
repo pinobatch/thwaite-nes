@@ -1,8 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
-# Bitmap to multi-console CHR converter using PIL or Pillow
+# Bitmap to multi-console CHR converter using Pillow
+# (with PB8 instead of PackBits)
 #
-# Copyright 2014 Damian Yerrick
+# Copyright 2014-2015 Damian Yerrick
 # Copying and distribution of this file, with or without
 # modification, are permitted in any medium without royalty
 # provided the copyright notice and this notice are preserved.
@@ -106,8 +107,8 @@ def parse_argv(argv):
     parser.add_option("-W", "--tile-width", dest="tileWidth",
                       help="set width of metatiles", metavar="HEIGHT",
                       type="int", default=8)
-    parser.add_option("--packbits", dest="packbits",
-                      help="use PackBits RLE compression",
+    parser.add_option("--pb8", dest="use_pb8",
+                      help="use PB8 compression",
                       action="store_true", default=False)
     parser.add_option("-H", "--tile-height", dest="tileHeight",
                       help="set height of metatiles", metavar="HEIGHT",
@@ -154,7 +155,7 @@ def parse_argv(argv):
             raise ValueError("cannot write CHR to terminal")
 
     return (infilename, outfilename, tileWidth, tileHeight,
-            options.packbits, options.planes, options.hflip, options.little)
+            options.use_pb8, options.planes, options.hflip, options.little)
 
 argvTestingMode = True
 
@@ -177,7 +178,7 @@ def main(argv=None):
             argv.extend(raw_input('args:').split())
     try:
         (infilename, outfilename, tileWidth, tileHeight,
-         usePackBits, planes, hflip, little) = parse_argv(argv)
+         use_pb8, planes, hflip, little) = parse_argv(argv)
     except Exception as e:
         sys.stderr.write("%s: %s\n" % (argv[0], str(e)))
         sys.exit(1)
@@ -187,11 +188,9 @@ def main(argv=None):
     outdata = pilbmp2chr(im, tileWidth, tileHeight,
                          lambda im: formatTilePlanar(im, planes, hflip, little))
     outdata = b''.join(outdata)
-    if usePackBits:
-        from packbits import PackBits
-        sz = len(outdata) % 0x10000
-        outdata = PackBits(outdata).flush().tostring()
-        outdata = b''.join([chr(sz >> 8), chr(sz & 0xFF), outdata])
+    if use_pb8:
+        from pb8 import pb8
+        outdata = pb8(outdata)
 
     # Read input file
     outfp = None
@@ -208,5 +207,4 @@ def main(argv=None):
 
 if __name__=='__main__':
     main()
-##    main(['pilbmp2nes.py', '../tilesets/char_pinocchio.png', 'char_pinocchio.chr'])
-##    main(['pilbmp2nes.py', '--packbits', '../tilesets/char_pinocchio.png', 'char_pinocchio.pkb'])
+

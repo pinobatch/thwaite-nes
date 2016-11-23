@@ -21,8 +21,8 @@
 ;
 ;   Visit http://www.pineight.com/ for more information.
 
-.include "src/nes.h"
-.include "src/ram.h"
+.include "nes.inc"
+.include "global.inc"
 
 B_TO_RESET = 0
 

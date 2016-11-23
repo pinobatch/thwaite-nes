@@ -20,8 +20,8 @@
 ;
 ;   Visit http://www.pineight.com/ for more information.
 
-.include "src/nes.h"
-.include "src/ram.h"
+.include "nes.inc"
+.include "global.inc"
 
 ;
 ; Because of NES PPU limitations, only half the explosions are

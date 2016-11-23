@@ -1,9 +1,10 @@
-#!/usr/bin/env python
-from __future__ import with_statement
+#!/usr/bin/env python3
+from __future__ import with_statement, print_function
 import os
 import re
 from itertools import groupby
 import subprocess
+import sys
 
 includeInternalColonLabels = True
 
@@ -75,7 +76,7 @@ def parseFile(body):
             if (line.startswith('*')
                 and (includeInternalColonLabels or len(scopeStack) == 0)):
                 labels.append((segmentStack[-1], '::'.join(scopeStack), label))
-                print "Equ *", labels[-1]
+                print("Equ *", labels[-1])
                 continue
 
             # Make a label for this line, and attach any refs in
@@ -160,7 +161,7 @@ Pair of Colons or in Hebrew is called Pa'amayim Nekudotayim.
         scopekey = ("::" if innerscope and scope else "").join((scope, innerscope))
         try:
             return (scopekey, callees[name][scopekey])
-        except KeyError, e:
+        except KeyError as e:
             if scope == '':
                 raise
             try:
@@ -185,7 +186,7 @@ dot -Tpng thwaitecalls.dag -o thwaitecalls.png
 """
 
     callset = set()
-    for ((eescope, name), (eefilename, eeseg, callers)) in allCallees.iteritems():
+    for ((eescope, name), (eefilename, eeseg, callers)) in allCallees.items():
         if eeseg in ('', 'ZEROPAGE', 'BSS'):
             continue
         callers = ((erscope,
@@ -233,10 +234,20 @@ srcFiles = [filename
             for filename in os.listdir(srcFolder)
             if filename.lower().endswith('.s')]
 bodies = []
+decodeerrors = 0
 for filename in srcFiles:
-    with open(os.path.join(srcFolder, filename)) as infp:
-        body = infp.read()
+    try:
+        path = os.path.join(srcFolder, filename)
+        with open(path) as infp:
+            body = infp.read()
+    except Exception:
+        import traceback
+        print("callgraph.py: while reading %s:" % path, file=sys.stderr)
+        traceback.print_exc()
+        decodeerrors += 1
     bodies.append((filename, body))
+if decodeerrors > 0:
+    sys.exit(1)
 
 allLabels = []
 allRefs = []
@@ -255,9 +266,9 @@ for (filename, labels) in allLabels:
             byLabel[name][scope] = (filename, seg)
 filename = seg = scope = name = bodies = None
 
-##print "\n".join("%s found in:\n%s" % (k, v)
+##print("\n".join("%s found in:\n%s" % (k, v)
 ##                for (k, v) in byLabel.items()
-##                if len(v) > 1)
+##                if len(v) > 1))
 
 # Resolve scope
 undefineds = set()
@@ -275,24 +286,24 @@ for (erfilename, refs) in allRefs:
                 allCallees[(eescope, name)] = (eefilename, eeseg, [])
             allCallees[(eescope, name)][2].append((erfilename, erseg, erscope))
 
-print len(allCallees), "labels are called at least once"
+print(len(allCallees), "labels are called at least once")
 
 sections = load_sections()
-print ("Put %d symbols into %d sections"
-       % (len(sections), len(frozenset(sections.values()))))
+print("Put %d symbols into %d sections"
+      % (len(sections), len(frozenset(sections.values()))))
 dagfile = callsToDOTInput(allCallees, sections)
 with open('thwaitecalls.dag', 'wt') as outfp:
     outfp.write(dagfile)
-print "Building PNG"
+print("Building PNG")
 subprocess.call('dot -Tpng thwaitecalls.dag -o thwaitecalls.png'.split())
 
-##print "Undefined symbols:"
-##print "\n".join("%s::%s" % row for row in sorted(undefineds))
+##print("Undefined symbols:")
+##print("\n".join("%s::%s" % row for row in sorted(undefineds)))
 
 lines2 = []
 seenCallers = set()
 calleeCounts = {}
-for ((eescope, name), (eefilename, eeseg, callers)) in allCallees.iteritems():
+for ((eescope, name), (eefilename, eeseg, callers)) in allCallees.items():
     if eeseg in ('', 'ZEROPAGE', 'BSS'):
         continue
 
@@ -311,15 +322,16 @@ for ((eescope, name), (eefilename, eeseg, callers)) in allCallees.iteritems():
     if lines:
         lines2.append("\n".join(lines))
         if len(lines2) > 100:
-##            print "\n".join(lines2)
+##            print("\n".join(lines2))
             lines2 = []
 ##if len(lines2) > 0:
-##    print "\n".join(lines2)
+##    print("\n".join(lines2))
 calledOnce = [(eescope, name, firstCaller)
               for ((eescope, name), (n, firstCaller)) in calleeCounts.items()
               if n < 2]
-calledOnce = sorted(calledOnce, key=lambda (s, n, c): (c, s, n))
-print "%d labels are called only once" % len(calledOnce)
+
+calledOnce.sort(key=lambda s_n_c: (s_n_c[2], s_n_c[0], s_n_c[1]))
+print("%d labels are called only once" % len(calledOnce))
 calledOnceCallers = [(caller, [call[:2] for call in calls])
                      for (caller, calls)
                      in groupby(calledOnce, lambda x: x[2])]
@@ -327,14 +339,14 @@ calledOnceTxt = ["%s:\n" % caller
                  + "\n".join("  .addr %s::%s" % (c, s)
                              for (c, s) in calls)
                  for (caller, calls) in calledOnceCallers]
-##print "\n".join(calledOnceTxt)
+##print("\n".join(calledOnceTxt))
 
 # To do: call itertools.groupby(iterable, keyfunc)
 # to put symbols with 1 caller into into sets by caller
 
-print "== leaf symbols =="
+print("== leaf symbols ==")
 leafSymbols = set()
-for ((eescope, name), (eefilename, eeseg, callers)) in allCallees.iteritems():
+for ((eescope, name), (eefilename, eeseg, callers)) in allCallees.items():
     if eeseg in ('', 'ZEROPAGE', 'BSS'):
         continue
     # Only top level symbols can be leaf symbols
@@ -343,21 +355,21 @@ for ((eescope, name), (eefilename, eeseg, callers)) in allCallees.iteritems():
         name = '::'.join((eescope, name))
     if name not in seenCallers:
         leafSymbols.add(name)
-##print leafSymbols
-##print "\n".join(sorted(leafSymbols))
+##print(leafSymbols)
+##print("\n".join(sorted(leafSymbols)))
 
-print "== unused symbols =="
+print("== unused symbols ==")
 unusedSymbols = {}
-for (name, scopes) in byLabel.iteritems():
-    for (eescope, (eefilename, eeseg)) in scopes.iteritems():
+for (name, scopes) in byLabel.items():
+    for (eescope, (eefilename, eeseg)) in scopes.items():
         if ((eescope, name) not in allCallees
             and not name.startswith(prefixesToIgnore)
             and name.lower() not in symbolsToIgnore):
             if eescope:
                 name = '::'.join((eescope, name))
             unusedSymbols[name] = eefilename
-print "\n".join("%s in %s is unused" % (name, eefilename)
-                for (name, eefilename) in sorted(unusedSymbols.iteritems()))
+print("\n".join("%s in %s is unused" % (name, eefilename))
+                for (name, eefilename) in sorted(unusedSymbols.items()))
 
 # Problems:
 # 1. when buildHouseRebuiltBar calls buildTipBar::suffix,

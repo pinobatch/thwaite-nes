@@ -20,8 +20,8 @@
 ;
 ;   Visit http://www.pineight.com/ for more information.
 
-.include "src/nes.h"
-.include "src/ram.h"
+.include "nes.inc"
+.include "global.inc"
 .import cut_scripts
 
 .segment "ZEROPAGE"
@@ -654,9 +654,11 @@ character_name_offset:
   .byt character_name13-character_name0
   .byt character_name14-character_name0
 
-character_name0:  .byt "T¯da",0
+il = $AF
+
+character_name0:  .byt "T",il,"da",0
 character_name1:  .byt "Meg",0
-character_name2:  .byt "M¯o",0    ; Player 1
+character_name2:  .byt "M",il,"o",0    ; Player 1
 character_name3:  .byt "Isca",0
 character_name4:  .byt "Gnivad",0
 character_name5:  .byt "Justin",0

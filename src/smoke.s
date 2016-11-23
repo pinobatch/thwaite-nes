@@ -20,8 +20,8 @@
 ;
 ;   Visit http://www.pineight.com/ for more information.
 
-.include "src/nes.h"
-.include "src/ram.h"
+.include "nes.inc"
+.include "global.inc"
 
 NUM_SMOKE = 48
 FIRST_SMOKE_TILE = $10

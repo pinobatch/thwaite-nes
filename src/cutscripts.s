@@ -20,6 +20,8 @@
 ;
 ;   Visit http://www.pineight.com/ for more information.
 
+il = $AF
+
 .export cut_scripts
 .segment "RODATA0"
 cut_scripts:
@@ -52,7 +54,7 @@ perfect_sun_script:
   .byt "XSomebody set up us the bomb.",12
   .byt "YI only wish we get signal.",12
   .byt "XI'm just glad none of those",10
-  .byt  "miss¯es hit.",0
+  .byt  "miss",il,"es hit.",0
 
 perfect_mon_script:
   .byt "XYZN"
@@ -102,7 +104,7 @@ perfect_thu_script:
 
 perfect_fri_script:
   .byt "XYZN"
-  .byt "XI st¯l think the threat is",10
+  .byt "XI st",il,"l think the threat is",10
   .byt  "real, but no one believes me.",12
   .byt "XEveryone else in town has",10
   .byt  "bought into $Y's theory",12
@@ -117,14 +119,14 @@ perfect_sat_script:
 ; that didn't make the compo deadline.
 .if 0
   .byt "XYZN"
-  .byt "NI st¯l need to write",12
+  .byt "NI st",il,"l need to write",12
   .byt  "the script for Saturday.",0
 .endif
 
 perfect_next_week_script:
   .byt "XYZN"
   .byt "ZAww man, no more fireworks!",12
-  .byt "XMy life is a steaming p¯e",10
+  .byt "XMy life is a steaming p",il,"e",10
   .byt  "of tech demo.",12
   .byt "NIt's a secret to everybody.",12
   .byt "NThank you for TASing Thwaite.",10
@@ -173,7 +175,7 @@ discover_clue_2:
   .byt  "piano wire. Do you play",10
   .byt  "an instrument?",12
   .byt "XNo. Why do you ask?",12
-  .byt "YIt might be from the miss¯e",10
+  .byt "YIt might be from the miss",il,"e",10
   .byt  "that hit your house.",12
   .byt "ZI'd go look myself, but",10
   .byt  "I keep thinking about my",10
@@ -200,7 +202,7 @@ end_script:
   .byt "XShame on you!",10
   .byt  "You better never show your",10
   .byt  "face in this town again.",12
-  .byt "ZCh¯l, $X. Hear him out.",12
+  .byt "ZCh",il,"l, $X. Hear him out.",12
   .byt "MI don't know what came",10
   .byt  "over me.",12
   .byt "MIt all started after",10

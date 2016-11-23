@@ -26,7 +26,7 @@
 ; http://en.wikipedia.org/wiki/Binary_scaling#Binary_angles
 ;
 
-.include "src/ram.h"
+.include "global.inc"
 .segment "CODE0"
 
 ;;
@@ -289,8 +289,8 @@ cosine256Q1:
 missileSine:
   .byt   0, 12, 24, 36, 45, 53, 59, 63
 missileCosine:
-  .byt  64, 63, 59, 53, 45, 36, 24, 12
-  .byt   0,-12,-24,-36,-45,-53,-59,-63
-  .byt -64,-63,-59,-53,-45,-36,-24,-12
-  .byt   0, 12, 24, 36, 45, 53, 59, 63
+  .byt   64,  63,  59,  53,  45,  36,  24,  12
+  .byt    0,<-12,<-24,<-36,<-45,<-53,<-59,<-63
+  .byt <-64,<-63,<-59,<-53,<-45,<-36,<-24,<-12
+  .byt    0,  12,  24,  36,  45,  53,  59,  63
 

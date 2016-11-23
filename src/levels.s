@@ -20,7 +20,7 @@
 ;
 ;   Visit http://www.pineight.com/ for more information.
 
-.include "src/ram.h"
+.include "global.inc"
 
 .import levelTips
 

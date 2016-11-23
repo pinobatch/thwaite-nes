@@ -20,8 +20,8 @@
 ;
 ;   Visit http://www.pineight.com/ for more information.
 
-.include "src/nes.h"
-.include "src/ram.h"
+.include "nes.inc"
+.include "global.inc"
 
 ; how many seconds in advance to predict a threat to a building
 ; can't be greater than FPS/255 (that is, 4 in NTSC)

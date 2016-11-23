@@ -7,7 +7,7 @@
 ; the copyright notice and this notice are preserved in any source
 ; code copies.  This file is offered as-is, without any warranty.
 ;
-.include "src/ram.h"
+.include "global.inc"
 
 ;; 
 ; Applies acceleration, braking, and speed limit.

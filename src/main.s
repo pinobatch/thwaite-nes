@@ -27,8 +27,8 @@
   .byt 1  ; vertical mirroring; low mapper nibble: 0
   .byt 0  ; high mapper nibble: 0; no NES 2.0 features used
 
-.include "src/nes.h"
-.include "src/ram.h"
+.include "nes.inc"
+.include "global.inc"
 .p02
 .segment "ZEROPAGE"
 psg_sfx_state: .res 32

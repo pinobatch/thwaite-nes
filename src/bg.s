@@ -20,8 +20,8 @@
 ;
 ;   Visit http://www.pineight.com/ for more information.
 
-.include "src/nes.h"
-.include "src/ram.h"
+.include "nes.inc"
+.include "global.inc"
 
 BG_GRASSNUM = $10
 TILE_BETWEEN_HOUSES = $8F
@@ -209,7 +209,7 @@ xferBufferIsFull:
 
 .proc buildHouseTiles
   lda bgDirty
-  and #~BG_DIRTY_HOUSES
+  and #<~BG_DIRTY_HOUSES
   sta bgDirty
   lda #$23
   sta houseXferDstHi
@@ -256,7 +256,7 @@ bottomHalfOnly:
 
 .proc buildStatusBar
   lda bgDirty
-  and #~BG_DIRTY_STATUS
+  and #<~BG_DIRTY_STATUS
   sta bgDirty
   lda #$23
   sta houseXferDstHi
@@ -377,7 +377,7 @@ noScore10s:
   sta houseXferBuf+32,y
 
   lda bgDirty
-  and #~BG_DIRTY_TIP
+  and #<~BG_DIRTY_TIP
   sta bgDirty
   ldy #$21
   lda #$00
@@ -393,7 +393,7 @@ noScore10s:
   lda #$40  ; row 10-11 instead of 8-9
   sta houseXferDstLo
   lda bgDirty
-  and #~BG_DIRTY_PRACTICE_METER
+  and #<~BG_DIRTY_PRACTICE_METER
   sta bgDirty
   
   ; Ammo
