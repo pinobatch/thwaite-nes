@@ -32,9 +32,16 @@ objdir = obj/nes
 srcdir = src
 imgdir = tilesets
 
-# -f while debugging code; -r while adding shuffle markup;
-# neither once a module has stabilized
-shufflemode = -r
+# The Windows Python installer puts py.exe in the path, but not
+# python3.exe, which confuses MSYS Make.  COMSPEC will be set to
+# the name of the shell on Windows and not defined on UNIX.
+ifdef COMSPEC
+DOTEXE:=.exe
+PY:=py
+else
+DOTEXE:=
+PY:=
+endif
 
 objlistntsc = $(foreach o,$(objlist),$(objdir)/$(o).o)
 
@@ -74,13 +81,13 @@ $(objdir)/cutscene.o: src/cutscene.pkb
 $(objdir)/practice.o: src/practice.txt
 
 $(objdir)/ntscPeriods.s: tools/mktables.py
-	$< period $@
+	$(PY) $< period $@
 
 map.txt thwaite.prg: nes.ini $(objlistntsc)
 	$(LD65) -o thwaite.prg -m map.txt -C $^
 
 $(objdir)/%.chr: $(imgdir)/%.png
-	tools/pilbmp2nes.py $< $@
+	$(PY) tools/pilbmp2nes.py $< $@
 
 %.nes: %.prg %.chr
 	cat $^ > $@
