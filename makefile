@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 #
 # Makefile for Thwaite
-# Copyright 2011 Damian Yerrick
+# Copyright 2011-2017 Damian Yerrick
 #
 # Copying and distribution of this file, with or without
 # modification, are permitted in any medium without royalty
@@ -13,13 +13,14 @@ version = 0.04wip
 objlist = main random levels smoke bg missiles explosion scurry \
           title practice cutscene cutscripts tips \
           math bcd unpkb pads mouse kinematics \
-          paldetect sound music musicseq ntscPeriods
+          paldetect pentlysound pentlymusic musicseq ntscPeriods
 
 CC65 = /usr/local/bin
 AS65 = ca65
 LD65 = ld65
 #EMU := "/C/Program Files/nintendulator/Nintendulator.exe"
 #EMU := mednafen -nes.pal 0 -nes.input.port1 gamepad -nes.input.port2 gamepad
+DEBUGEMU := ~/.wine/drive_c/Program\ Files\ \(x86\)/FCEUX/fceux.exe
 EMU := fceux
 CC = gcc
 ifdef COMSPEC
@@ -46,7 +47,7 @@ endif
 
 objlistntsc = $(foreach o,$(objlist),$(objdir)/$(o).o)
 
-.PHONY: run dist zip
+.PHONY: run debug all dist zip clean
 
 run: $(title).nes
 	$(EMU) $<
@@ -71,7 +72,13 @@ zip.in:
 
 # Some unzip tools won't create empty folders, so put a file there.
 $(objdir)/index.txt: makefile CHANGES.txt
-	echo Files produced by build tools go here, but caulk goes where? > $@
+	echo "Files produced by build tools go here." > $@
+
+clean:
+	-rm $(objdir)/*.o $(objdir)/*.s $(objdir)/*.chr
+	-rm $(title).chr $(title).prg
+
+# assembly language
 
 $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/global.inc
 	$(AS65) $(CFLAGS65) $< -o $@
