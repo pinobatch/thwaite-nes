@@ -53,13 +53,15 @@ lruTargets: .res NUM_BUILDINGS
   rts
 .endproc
 
+LRU_BITS = 3
+
 .proc chooseRandomTarget
-  ldy #3
+  ldy #LRU_BITS
   jsr random
-  lda #$07
+  lda #(1 << LRU_BITS) - 1
   and rand3
   clc
-  adc #NUM_BUILDINGS - 8
+  adc #NUM_BUILDINGS - (1 << LRU_BITS)
   tay
   lda lruTargets,y
   pha

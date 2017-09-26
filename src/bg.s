@@ -255,6 +255,7 @@ bottomHalfOnly:
 .endproc
 
 .proc buildStatusBar
+highdigits = $00
   lda bgDirty
   and #<~BG_DIRTY_STATUS
   sta bgDirty
@@ -281,7 +282,7 @@ loop:
   jsr bcd8bit
   ora #BG_GRASSNUM
   sta houseXferBuf+8
-  lda 0
+  lda highdigits
   beq noLeftTens
   ora #BG_GRASSNUM
   sta houseXferBuf+7
@@ -290,7 +291,7 @@ noLeftTens:
   jsr bcd8bit
   ora #BG_GRASSNUM
   sta houseXferBuf+24
-  lda 0
+  lda highdigits
   beq noRightTens
   ora #BG_GRASSNUM
   sta houseXferBuf+23
@@ -329,7 +330,7 @@ noColon:
   sta houseXferBuf+61
   lda #BG_GRASSNUM
   sta houseXferBuf+57
-  ora 0
+  ora highdigits
   sta houseXferBuf+60
   
   ; draw score
@@ -341,7 +342,7 @@ noColon:
   jsr bcd8bit
   ora #BG_GRASSNUM
   sta houseXferBuf+35
-  lda 0
+  lda highdigits
   beq noScore100s
   ora #BG_GRASSNUM
   sta houseXferBuf+34
@@ -350,10 +351,10 @@ noScore100s:
   jsr bcd8bit
   ora #BG_GRASSNUM
   sta houseXferBuf+37
-  lda 0
+  lda highdigits
   ora score100s
   beq noScore10s
-  lda 0
+  lda highdigits
   ora #BG_GRASSNUM
   sta houseXferBuf+36
 noScore10s:
@@ -389,6 +390,7 @@ noScore10s:
 ;;
 ; Builds the practice mode ammo/speed/delay meters
 .proc buildPracticeMeterBar
+highdigits = $00
   jsr clearTipBar
   lda #$40  ; row 10-11 instead of 8-9
   sta houseXferDstLo
@@ -401,7 +403,7 @@ noScore10s:
   jsr bcd8bit
   ora #'0'
   sta houseXferBuf+6
-  lda 0
+  lda highdigits
   beq noAmmoTens
   ora #'0'
   sta houseXferBuf+5
@@ -412,7 +414,7 @@ noAmmoTens:
   jsr bcd8bit
   ora #'0'
   sta houseXferBuf+19
-  lda 0
+  lda highdigits
   ora #'0'
   sta houseXferBuf+17
   
@@ -427,11 +429,11 @@ noAmmoTens:
   jsr bcd8bit
   ora #'0'
   sta houseXferBuf+13
-  lda 0
+  lda highdigits
   beq noSpeedTens
   ora #'0'
   sta houseXferBuf+12
-  lda 0
+  lda highdigits
   cmp #16
   bcc noSpeedTens
   lsr a
@@ -493,6 +495,9 @@ doneLoadingTip:
 ; @param 1 Displayed points added
 ; @param siloMissilesLeft Number of missiles left
 .proc buildLevelRewardBar
+numHouses = $00
+addedPoints = $01
+highdigits = $00
   ; First load the tip
   lda #2
   sta curTip
@@ -502,11 +507,11 @@ doneLoadingTip:
 
   ; Write the number of houses now, because bcd8bit
   ; destroys the value in 0
-  lda 0
+  lda numHouses
   jsr bcd8bit
   ora #'0'
   sta houseXferBuf+41
-  lda 0
+  lda highdigits
   beq noHouseTens
   ora #'0'
   sta houseXferBuf+40
@@ -519,22 +524,22 @@ noHouseTens:
   jsr bcd8bit
   ora #'0'
   sta houseXferBuf+45
-  lda 0
+  lda highdigits
   beq noMissileTens
   ora #'0'
   sta houseXferBuf+44
 noMissileTens:
 
   ; Write 
-  lda 1
+  lda addedPoints
   jsr bcd8bit
   ora #'0'
   sta houseXferBuf+59
-  lda 0
+  lda highdigits
   beq noBonusTens
   ora #'0'
   sta houseXferBuf+58
-  lda 0
+  lda highdigits  ; hundreds
   cmp #16
   bcc noBonusTens
   lsr a
@@ -720,17 +725,18 @@ notRollOver:
 .proc countHousesLeft
   ldx #NUM_BUILDINGS-1
   ldy #0
-counthousesleftloop:
-  cpx #2
-  beq :+
-  cpx #9
-  beq :+
-  lda housesStanding,x
-  beq :+
-  iny
-:
-  dex
-  bpl counthousesleftloop
+  counthousesleftloop:
+    cpx #BUILDING_SILO0
+    beq notHouse
+    cpx #BUILDING_SILO1
+    beq notHouse
+    lda housesStanding,x
+    beq notStanding
+      iny
+    notStanding:
+    notHouse:
+    dex
+    bpl counthousesleftloop
   rts
 .endproc
 

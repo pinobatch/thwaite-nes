@@ -1,6 +1,7 @@
 *.sw[a-p]
 *.o
 *~
+*.prg
 *.chr
 /obj/nes/*.s
 /zip.in

@@ -34,7 +34,7 @@
 psg_sfx_state: .res 32
 .export psg_sfx_state
 
-LAWN_MOWER_NMI = 1
+LAWN_MOWER_NMI = 0
 
 .if LAWN_MOWER_NMI
   nmis_old: .res 1  ; Using nmis from lawn mower
@@ -443,13 +443,13 @@ notRestart:
   sta siloMissilesLeft
   
   ; but don't replenish destroyed silos
-  lda housesStanding+2
+  lda housesStanding+BUILDING_SILO0
   bne standing0
   sta siloMissilesLeft
   lda #20
   sta siloMissilesLeft+1
 standing0:
-  lda housesStanding+9
+  lda housesStanding+BUILDING_SILO1
   bne standing1
   sta siloMissilesLeft+1
   lda #20
@@ -480,8 +480,8 @@ hourlyMusic:
 ; "Active" is the only state in which player missiles get fired.
 .proc doStateActive
   ; end game if no silos are standing
-  lda housesStanding+2
-  ora housesStanding+9
+  lda housesStanding+BUILDING_SILO0
+  ora housesStanding+BUILDING_SILO1
   bne silosStillExist
   lda #STATE_GAMEOVER
   sta gameState
@@ -611,15 +611,15 @@ repairEvenIfHouseDestroyed:
   lda #3
   cmp curTip
   beq alreadySet
-  ldx housesStanding+2
+  ldx housesStanding+BUILDING_SILO0
   bne leftIsStillStanding
-  inc housesStanding+2
+  inc housesStanding+BUILDING_SILO0
   bne finishStateSetup
 
 leftIsStillStanding:
-  ldx housesStanding+9
+  ldx housesStanding+BUILDING_SILO1
   bne stateIsDone
-  inc housesStanding+9
+  inc housesStanding+BUILDING_SILO1
 finishStateSetup:
   sta curTip
   lda #40

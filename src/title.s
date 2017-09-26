@@ -430,10 +430,6 @@ noMouseCrosshair:
   asl a
   asl a
   asl a
-  pha
-  lda nmis
-  lsr a
-  pla
   adc #130
   sta OAM+0,x
   lda #SELECTED_ARROW_TILE

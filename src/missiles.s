@@ -105,9 +105,9 @@ salvoLeft: .res 1
   sta crosshairDXLo,x
   dex
   bpl :-
-  lda #64
+  lda #CURSOR_X0
   sta crosshairXHi
-  lda #192
+  lda #CURSOR_X1
   sta crosshairXHi+1
   jmp clearExplosions
 .endproc
@@ -606,12 +606,12 @@ gotHitBuilding:
   sta housesStanding,y
 
   ; If it's a silo, set the number of missiles to 0.
-  cpy #2
+  cpy #BUILDING_SILO0
   bne notSilo0
   sta siloMissilesLeft
   beq wasAlreadyDestroyed
 notSilo0:
-  cpy #9
+  cpy #BUILDING_SILO1
   bne notSilo1
   sta siloMissilesLeft+1
   beq wasAlreadyDestroyed
@@ -804,7 +804,7 @@ mirvDXSign = 13
   ; Place one missile either one to the left or
   ; two to the right of this one.
   lda missileTarget,x
-  cmp #9
+  cmp #NUM_BUILDINGS-3
   bcc notAfter9
   sbc #3
 notAfter9:
@@ -1186,10 +1186,7 @@ foundEmptySlot:
   sta missileDstX,y
   lda 3
   sta missileDstY,y
-  txa
-  lsr a
-  lda #128
-  ror a
+  lda siloX,x
   sta missileXHi,y
   jsr measureFromSilo
   ldx mslot
@@ -1307,3 +1304,5 @@ missileTileHotspotY:
   .byt 6
 missileTileHotspotX:  
   .byt 6, 1, 1, 6
+siloX:
+  .byt 64, 192

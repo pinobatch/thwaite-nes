@@ -8,6 +8,7 @@
 # provided the copyright notice and this notice are preserved.
 # This file is offered as-is, without any warranty.
 #
+title = thwaite
 version = 0.04wip
 objlist = main random levels smoke bg missiles explosion scurry \
           title practice cutscene cutscripts tips \
@@ -47,16 +48,20 @@ objlistntsc = $(foreach o,$(objlist),$(objdir)/$(o).o)
 
 .PHONY: run dist zip
 
-run: thwaite.nes
+run: $(title).nes
 	$(EMU) $<
+debug: $(title).nes
+	$(DEBUGEMU) $<
+
+all: $(title).nes
 
 # Actually this depends on every single file in zip.in, but currently
 # we use changes to thwaite.nes, makefile, and README as a heuristic
 # for when something was changed.  Limitation: it won't see changes
 # to docs or tools.
 dist: zip
-zip: thwaite-$(version).zip
-thwaite-$(version).zip: zip.in thwaite.nes README.html $(objdir)/index.txt
+zip: $(title)-$(version).zip
+$(title)-$(version).zip: zip.in $(title).nes README.html $(objdir)/index.txt
 	zip -9 -u $@ -@ < $<
 
 # Build zip.in from the list of files in the Git tree
@@ -83,8 +88,8 @@ $(objdir)/practice.o: src/practice.txt
 $(objdir)/ntscPeriods.s: tools/mktables.py
 	$(PY) $< period $@
 
-map.txt thwaite.prg: nes.ini $(objlistntsc)
-	$(LD65) -o thwaite.prg -m map.txt -C $^
+map.txt $(title).prg: nes.ini $(objlistntsc)
+	$(LD65) -o $(title).prg -m map.txt -C $^
 
 $(objdir)/%.chr: $(imgdir)/%.png
 	$(PY) tools/pilbmp2nes.py $< $@
@@ -92,6 +97,6 @@ $(objdir)/%.chr: $(imgdir)/%.png
 %.nes: %.prg %.chr
 	cat $^ > $@
 
-thwaite.chr: $(objdir)/maingfx.chr $(objdir)/cuthouses.chr
+$(title).chr: $(objdir)/maingfx.chr $(objdir)/cuthouses.chr
 	cat $^ > $@
 

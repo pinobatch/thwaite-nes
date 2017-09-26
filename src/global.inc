@@ -57,13 +57,17 @@ SELECTED_ARROW_TILE = $02
 
 ; bg constants
 NUM_BUILDINGS = 12
+BUILDING_SILO0 = 2
+BUILDING_SILO1 = 9
+BUILDING_DESTROYED = 0
+BUILDING_OK = 1
+BUILDING_THREATENED = 2
+
 BG_DIRTY_HOUSES = $01
 BG_DIRTY_STATUS = $02
 BG_DIRTY_TIP = $04
 BG_DIRTY_PRACTICE_METER = $08
-BUILDING_DESTROYED = 0
-BUILDING_OK = 1
-BUILDING_THREATENED = 2
+
 ; bg fields
 .global housesStanding, houseX, score1s, score100s
 .global gameDay, gameHour, gameMinute, gameSecond, gameTenthSecond, gameSubTenth
@@ -85,6 +89,9 @@ MISSILE_SPAWN_Y = 8
 BALLOON_SPAWN_Y = 40  ; in range 0-63 plus this
 SILO_Y = 192  ; player missiles launch from here
 BUILDING_HIT_Y = 200
+CURSOR_X0 = 64  ; crosshair start position
+CURSOR_X1 = 192
+
 ; missiles fields
 .global crosshairXLo, crosshairXHi, crosshairDXLo, crosshairDXHi
 .global crosshairYLo, crosshairYHi, crosshairDYLo, crosshairDYHi
