@@ -78,6 +78,7 @@ firstDestroyedHouse: .res 1
   sta bgDirty
   lda #VBLANK_NMI
   ldx #$00
+  stx houseXferDstHi
   ldy #$3F
   sta PPUCTRL
   stx PPUMASK
