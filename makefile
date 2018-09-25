@@ -12,7 +12,7 @@ title = thwaite
 version = 0.04wip
 objlist = main random levels smoke bg missiles explosion scurry \
           title practice cutscene cutscripts tips \
-          math bcd unpkb pads mouse kinematics \
+          math bcd kinematics unpkb pads mouse ppuclear \
           paldetect pentlysound pentlymusic musicseq ntscPeriods
 
 CC65 = /usr/local/bin

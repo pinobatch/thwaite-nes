@@ -82,8 +82,8 @@ txt_done:
 .segment "CODE"
 .proc display_todo
   lda #VBLANK_NMI
-  ldx #$00
   ldy #$3F
+  ldx #$00
   sta PPUCTRL
   stx PPUMASK
   sty PPUADDR
@@ -95,19 +95,11 @@ copypal:
   cpx #32
   bcc copypal
 
-  ; clear nt
-  ldy #$20
-  sty PPUADDR
+  ; clear nametable
+  lda #$20
+  tax
   ldy #$00
-  sty PPUADDR
-  tya
-:
-  sta PPUDATA
-  sta PPUDATA
-  sta PPUDATA
-  sta PPUDATA
-  dey
-  bne :-
+  jsr ppu_clear_nt
 
   lda #>todo_txt
   sta 1
@@ -124,13 +116,11 @@ loop:
 :
   cmp nmis
   beq :-
-  lda #0
-  ldx #VBLANK_NMI|BG_0000
-  ldy #BG_ON
-  sta PPUSCROLL
-  sta PPUSCROLL
-  stx PPUCTRL
-  sty PPUMASK
+  ldx #0
+  lda #VBLANK_NMI|BG_0000
+  ldy #0
+  clc
+  jsr ppu_screen_on
   jsr update_sound
   jsr read_pads
   jsr title_detect_mice
@@ -219,10 +209,10 @@ loop:
   jsr title_detect_mice
 
 s0wait0:
-  bit $2002
+  bit PPUSTATUS
   bvs s0wait0
 s0wait1:
-  bit $2002
+  bit PPUSTATUS
   bmi s0waitfail
   bvc s0wait1
   lda #VBLANK_NMI|BG_1000|OBJ_1000
@@ -400,7 +390,7 @@ notUp:
 .endproc
 
 .proc title_draw_sprites
-  ldx oamIndex
+  ldx #4  ; skip sprite 0
 
   lda mouseEnabled
   ora mouseEnabled+1
@@ -452,8 +442,8 @@ not_mouse:
   dey
   bpl miceloop
 
-  stx oamIndex
-  jsr clearRestOfOAM
+  ; x = new oam_used value
+  jsr ppu_clear_oam
 
   ; draw sprite 0, used to switch in CHR for "1 Player" text
   ; (which is written in FH, 15px autohinted)

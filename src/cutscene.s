@@ -62,9 +62,8 @@ cutscene_actors: .res 4
   sta PPUMASK
 
   ; load the background image
-  lda #$20
-  sta PPUADDR
-  lda #$00
+  ldy #$20
+  sty PPUADDR
   sta PPUADDR
   sta stacked_script_ptr+1
   lda #<cutscene_pkb
@@ -209,11 +208,9 @@ skipHandleScript:
   stx OAMADDR
   sta OAM_DMA
   lda #VBLANK_NMI|BG_1000|OBJ_1000
-  ldy #BG_ON|OBJ_ON
-  sta PPUCTRL
-  stx PPUSCROLL
-  stx PPUSCROLL
-  sty PPUMASK
+  ldy #0
+  sec
+  jsr ppu_screen_on
 
   jsr read_pads
   lda mouseEnabled+0

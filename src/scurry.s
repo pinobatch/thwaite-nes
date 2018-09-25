@@ -145,7 +145,7 @@ isNTSC:
   sta exclSpd
 
   ldx #NUM_EXCLS - 1
-  ldy oamIndex
+  ldy oam_used
 eachExcl:
   cpy #$FC
   bcs skipAllExcls
@@ -208,10 +208,10 @@ attr1 = 1
 attr2 = 2
 
   ; hide the villager if it's at its target
-  sty oamIndex
+  sty oam_used
   ldy villagerTarget,x
   lda houseX,y
-  ldy oamIndex
+  ldy oam_used
   asl a
   asl a
   asl a
@@ -251,7 +251,7 @@ noDraw:
   dex
   bpl eachVillager
 bail:
-  sty oamIndex
+  sty oam_used
 
   lda gameSubTenth
   cmp #3

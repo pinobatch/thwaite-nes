@@ -153,7 +153,7 @@ runExplosionFrame:
   clc
   adc explodeY,x
   sta exploY
-  ldx oamIndex
+  ldx oam_used
   lda #0
   sta rowNum
   lda #$01
@@ -236,7 +236,7 @@ nosetyflip:
   ; now we're done drawing, so let's load the variables
   ; used for collision
 distSquared = rowNum
-  stx oamIndex
+  stx oam_used
   ldx exploNumber
   cpx #NUM_EXPLOSIONS
   bcc notOverflow

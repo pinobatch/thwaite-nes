@@ -25,11 +25,14 @@ STATE_REBUILDING_SILO = 4
 STATE_CUTSCENE = 5
 STATE_REBUILDING_HOUSE = 6
 STATE_GAMEOVER = 7
-.globalzp nmis, oamIndex, numPlayers, tvSystem, mouseEnabled
+.globalzp nmis, oam_used, numPlayers, tvSystem, mouseEnabled
 .globalzp debugHex1, debugHex2
 .globalzp gameState
 ; main methods
-.global clearRestOfOAM, doStateNewLevel
+.global doStateNewLevel
+
+; ppuclear.s methods
+.global ppu_clear_nt, ppu_clear_oam, ppu_screen_on
 
 ; pads fields
 .globalzp cur_keys, new_keys, das_timer, das_keys

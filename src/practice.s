@@ -52,10 +52,12 @@ practiceHour: .res 1
   jsr display_textfile
 loop:
   ldx #0
+  stx oam_used
   jsr moveCrosshairPlayerX
   jsr drawCrosshairPlayerX
   jsr drawPracticeMenuSprites
-  jsr clearRestOfOAM
+  ldx oam_used
+  jsr ppu_clear_oam
   jsr buildBGUpdate
   jsr update_sound
 
@@ -244,7 +246,7 @@ houseNotOK:
 
 
 .proc drawPracticeMenuSprites
-  ldx oamIndex
+  ldx oam_used
 
   lda #39
   sta OAM,x
@@ -375,7 +377,7 @@ salvoAddToY:
   lda salvoID
   cmp #4
   bcc salvoLoop
-  stx oamIndex
+  stx oam_used
   rts
 .endproc
 

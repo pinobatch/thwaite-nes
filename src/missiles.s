@@ -143,7 +143,7 @@ notBalloon:
   and #$0F
   tay
   lda missileTileNumber,y
-  ldy oamIndex
+  ldy oam_used
   sta OAM+1,y
   lda missileType,x
   cmp #MISSILE_TYPE_MIRV
@@ -166,7 +166,7 @@ notMIRV:
   tya
   clc
   adc #4
-  sta oamIndex
+  sta oam_used
   rts
 .endproc
 
@@ -182,7 +182,7 @@ spr_xpos = 0
   adc #4  ; balloon hotspot: (4, 4)
   sta spr_xpos
 
-  ldy oamIndex
+  ldy oam_used
   cpy #$F8
   bcs overLeftEdge
   lda missileXHi,x
@@ -208,7 +208,7 @@ spr_xpos = 0
   tya
   clc
   adc #8
-  sta oamIndex
+  sta oam_used
 overLeftEdge:
   rts  
 .endproc
@@ -319,7 +319,7 @@ notDrawUnallocated:
   and #$01
   ora #$02
   tax
-  ldy oamIndex
+  ldy oam_used
 drawMissileDstLoop:
   lda missileYHi,x
   beq skipDrawMissileDst
@@ -344,7 +344,7 @@ skipDrawMissileDst:
   dex
   dex
   bpl drawMissileDstLoop
-  sty oamIndex
+  sty oam_used
   rts
 .endproc
 
@@ -926,12 +926,11 @@ didNotSplit:
 .endproc
 
 .proc drawCrosshairPlayerX
-  ldy oamIndex
+  ldy oam_used
   lda crosshairXHi,x
   sec
   sbc #4
   sta OAM+3,y
-  sta OAM+3
   lda crosshairYHi,x
   sec
   sbc #5
@@ -944,7 +943,7 @@ didNotSplit:
   tya
   clc
   adc #4
-  sta oamIndex
+  sta oam_used
   rts
 .endproc
 

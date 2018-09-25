@@ -42,7 +42,7 @@ LAWN_MOWER_NMI = 0
 .else
   nmis: .res 1
 .endif
-oamIndex: .res 1
+oam_used: .res 1
 debugHex1: .res 1
 debugHex2: .res 1
 cur_keys: .res 2
@@ -124,18 +124,14 @@ vwait1:
   ; 29000 cycles to burn without touching the PPU.  So we have time
   ; to initialize some of RAM to known values.
   ; Ordinarily the "new game" initializes everything that the game
-  ; itself needs, so we'll just do zero page and shadow OAM.
-  ldy #$00
-  lda #$F0
+  ; itself needs, so we'll just do zero page.
   ldx #$00
+  txa
 clear_zp:
-  sty $00,x
-  sta OAM,x
+  sta $00,x
   inx
   bne clear_zp
-  ; the most basic sound engine possible
-;  lda #$0F
-;  sta $4015
+
   jsr init_sound
   
   lda #2
@@ -146,6 +142,7 @@ clear_zp:
   sta rand0
   
   ; Wait for the PPU to warm up (part 2 of 2)
+  ; after which all vblank waiting is through NMI
 vwait2:
   bit PPUSTATUS
   bpl vwait2
@@ -208,8 +205,6 @@ practice_nocutscene:
   lda #0
   sta housesLeftClass
   sta investigationStep
-  lda #4
-  sta oamIndex
 
 .if ::START_AT_5AM
   sta gameHour  ; DEBUG! testing the cut scene code
@@ -235,7 +230,11 @@ notPaused:
   ldx #BG_ON|OBJ_ON|LIGHTGRAY|TINT_R
   stx PPUMASK
 .endif  
+
+  ; Draw sprites
   ldx #0
+  stx oam_used
+  stx $4444
 drawAllCrosshairs:
   jsr drawCrosshairPlayerX
   inx
@@ -245,7 +244,8 @@ drawAllCrosshairs:
   ldx #BG_ON|OBJ_ON
   stx PPUMASK
 .endif  
-  
+
+  ; Move and draw sprites appropriate for this game state
   jsr doStateAction
   
 .if ::PROFILE_LIGHTGRAY
@@ -260,7 +260,8 @@ drawAllCrosshairs:
   ldx #BG_ON|OBJ_ON
   stx PPUMASK
 .endif  
-  jsr clearRestOfOAM
+  ldx oam_used
+  jsr ppu_clear_oam
   
   ; we're done preparing all updates
   lda nmis
@@ -269,56 +270,24 @@ drawAllCrosshairs:
   beq :-
   jsr blitBGUpdate
 
-  lda #0
-  sta $2003
-  sta PPUSCROLL
-  sta PPUSCROLL
+  ldx #0
+  ldy #0
+  stx OAMADDR
   lda #>OAM
-  sta $4014
+  sta OAM_DMA
   lda #VBLANK_NMI|BG_0000|OBJ_1000
-  sta PPUCTRL
-  lda #BG_ON|OBJ_ON
-  sta PPUMASK
+  sec
+  jsr ppu_screen_on
 
   lda gameState  
   cmp #STATE_INACTIVE
-  beq :+
-  jmp gameLoop
-:
+  bne gameLoop
+
   jmp restart
 .endproc
 
-.proc clearRestOfOAM
-  lda oamIndex
-  and #$FC
-  tax
-  beq nothingToClear
-  lda #$FF
-xloop:
-  sta OAM,x
-  inx
-  inx
-  inx
-  inx
-  bne xloop
-nothingToClear:
-.if 0  ; whether using sprite 0
-  lda #15
-  sta OAM+1
-  lda #%00100010
-  sta OAM+2
-  lda #S0_TRIGGER_X * 8
-  sta OAM+3
-  lda #S0_TRIGGER_Y * 8 - 1
-.else
-  lda #$FF
-.endif
-  sta OAM
-  ldx #4
-  stx oamIndex
-  rts
-.endproc
-
+;;
+; These are done 10 times a second
 .proc tenthUpdates
   jsr updateAllExplosions
   jsr updateMissiles
@@ -334,31 +303,32 @@ nothingToClear:
 .endproc
 
 .proc pauseScreen
-  ldy #4  ; leave room for sprite 0 in case tip is on screen
+
+  ; Draw "PAUSE" as sprites
+  ldy #0
   ldx #0
 buildPauseText:
   lda #111
-  sta OAM,y
-  lda pauseText,x
-  sta OAM+1,y
+  sta OAM,x
+  lda pauseText,y
+  sta OAM+1,x
   lda #%00000001
-  sta OAM+2,y
-  txa
+  sta OAM+2,x
+  tya
   asl a
   asl a
   asl a
   asl a
   adc #92
-  sta OAM+3,y
-  iny
-  iny
-  iny
-  iny
+  sta OAM+3,x
   inx
-  cpx #5
+  inx
+  inx
+  inx
+  iny
+  cpy #5
   bcc buildPauseText
-  sty oamIndex
-  jsr clearRestOfOAM
+  jsr ppu_clear_oam
 
 loop:
   lda nmis
@@ -366,16 +336,18 @@ loop:
   cmp nmis
   beq :-
   sta nmis  ; in pause, NMI counting is frozen
-  lda #0
-  sta OAMADDR
+  ldx #0
+  ldy #0
+  sty OAMADDR
   lda #>OAM
   sta OAM_DMA
   lda #VBLANK_NMI|OBJ_0000|BG_0000
-  sta PPUCTRL
-  lda #OBJ_ON|BG_ON
-  sta PPUMASK
+  sec
+  jsr ppu_screen_on
   jsr update_sound
   jsr read_pads
+
+  ; Start Select in practice: Return to practice screen
   lda new_keys
   and #KEY_SELECT
   beq notSelect
