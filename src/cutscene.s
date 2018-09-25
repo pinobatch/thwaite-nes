@@ -138,7 +138,7 @@ oamendloop:
   lda cut_scripts+1,x
   sta script_ptr+1
 
-  jsr update_sound
+  jsr pently_update
   lda nmis
 vw1:
   cmp nmis
@@ -164,9 +164,9 @@ load_actors_loop:
   jsr cut_handle_state_new_graph
 
   lda #MUSIC_1600
-  jsr init_music
+  jsr pently_start_music
 main_loop:
-  jsr update_sound
+  jsr pently_update
   
   lda nmis
 vw:
@@ -255,7 +255,7 @@ notWrappedToNeg:
 jmp_loop:
   jmp main_loop
 bail:
-  jmp stop_music
+  jmp pently_stop_music
 
 .endproc
 
@@ -494,6 +494,8 @@ not_role:
 ;;
 ; Chooses three villagers at random to fit the three roles in the
 ; game's script, according to the villagers' personalities.
+; Allows forcing choice of one of them as the paranoid one,
+; which occurs at the start of the non-100% track.
 ; @param X 1 for game start, 0 for already having chosen paranoid
 .proc cut_choose_villagers
 randacc = 3

@@ -10,9 +10,9 @@
 
 .importzp psg_sfx_state
 .import soundBSS
-.import start_sound
+.import pently_start_sound
 .export music_playing
-.export init_music, stop_music, update_music, update_music_ch
+.export pently_start_music, pently_stop_music, update_music, update_music_ch
 .include "pentlyseq.inc"
 
 .ifndef SOUND_NTSC_ONLY
@@ -59,7 +59,7 @@ durations:
   .byt 1, 2, 3, 4, 6, 8, 12, 16
 
 .segment "CODE"
-.proc init_music
+.proc pently_start_music
   asl a
   tax
   lda songTable,x
@@ -99,7 +99,7 @@ durations:
   rts
 .endproc
 
-.proc stop_music
+.proc pently_stop_music
   lda #0
   sta music_playing
   rts
@@ -315,12 +315,12 @@ isDrumNote:
   pha
   tax
   lda drumSFX,x
-  jsr start_sound
+  jsr pently_start_sound
   pla
   tax
   lda drumSFX+1,x
   bmi noSecondDrum
-  jsr start_sound
+  jsr pently_start_sound
 noSecondDrum:
   ldx 5
   jmp skipNote

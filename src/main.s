@@ -85,10 +85,10 @@ ONE_MISSILE_PER_LEVEL = 0
 
 ; tokumaru thinks only simple little single-screen puzzle games
 ; can get away with waiting for vblank
-; http://nesdev.parodius.com/bbs/viewtopic.php?t=6229
+; https://forums.nesdev.com/viewtopic.php?t=6229
 ; and he isn't a big fan of simple little single-screen puzzle games
-; http://nesdev.parodius.com/bbs/viewtopic.php?t=5927
-; http://nesdev.parodius.com/bbs/viewtopic.php?p=59105#59105
+; https://forums.nesdev.com/viewtopic.php?t=5927
+; https://forums.nesdev.com/viewtopic.php?p=59105#p59105
 ; but my philosophy is to do the simplest thing that could work
 ; http://c2.com/xp/DoTheSimplestThingThatCouldPossiblyWork.html
 ; and without a status bar, 'inc nmis' is the simplest thing because
@@ -132,7 +132,7 @@ clear_zp:
   inx
   bne clear_zp
 
-  jsr init_sound
+  jsr pently_init
   
   lda #2
   sta practiceSide
@@ -153,7 +153,7 @@ vwait2:
   jsr getTVSystem
   sta tvSystem
 restart:
-  jsr stop_music
+  jsr pently_stop_music
   
   lda isPractice
   bne practice_skiptitle
@@ -163,14 +163,7 @@ restart:
   bcc practice_skiptitle
   sta isPractice
 practice_skiptitle:
-  .if 0
-  ; Test for http://forums.nesdev.com/viewtopic.php?p=117048#p117048
-  sec
-  lda #$aa
-  .byte $6B,$55
-  .else
   lda #$C0
-  .endif
   sta debugHex1
   lda #$DE
   sta debugHex2
@@ -214,7 +207,7 @@ gameLoop:
   jsr incGameClock
   jsr read_pads
   jsr mouse_to_vel
-  jsr update_sound
+  jsr pently_update
 
   lda new_keys
   and #KEY_START
@@ -344,7 +337,7 @@ loop:
   lda #VBLANK_NMI|OBJ_0000|BG_0000
   sec
   jsr ppu_screen_on
-  jsr update_sound
+  jsr pently_update
   jsr read_pads
 
   ; Start Select in practice: Return to practice screen
@@ -439,7 +432,7 @@ standing1:
   bcs notPracticeMenu
   ldx gameHour
   lda hourlyMusic,x
-  jsr init_music
+  jsr pently_start_music
 notPracticeMenu:
 
   jmp initRandomTarget
@@ -457,7 +450,7 @@ hourlyMusic:
   bne silosStillExist
   lda #STATE_GAMEOVER
   sta gameState
-  jsr stop_music
+  jsr pently_stop_music
   rts
 silosStillExist:
 
@@ -519,7 +512,7 @@ levelNotOver:
   beq alreadySet
 
   ; and add 10 * houses to the score
-  jsr stop_music
+  jsr pently_stop_music
   jsr countHousesLeft
   sty 0
   tya
@@ -558,7 +551,7 @@ notYet:
   ora gameSubTenth
   bne notMusic
   lda #MUSIC_CLEARED_LEVEL
-  jsr init_music
+  jsr pently_start_music
 notMusic:
   rts
 .endproc

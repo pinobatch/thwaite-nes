@@ -782,7 +782,7 @@ available2:
   sta missileTarget,x
 noMiddle:
   lda #SFX_SPLIT
-  jsr start_sound
+  jsr pently_start_sound
   ldx 2
   rts
 .endproc
@@ -919,7 +919,7 @@ bail:
   lda #MISSILE_TYPE_NORMAL
   sta missileType,x
   lda #SFX_SPLIT
-  jsr start_sound
+  jsr pently_start_sound
   ldx parentSlot
 didNotSplit:
   rts
@@ -1285,7 +1285,7 @@ xNotNeg3:
   sta missileDXLo,x
 
   lda #SFX_LAUNCH
-  jsr start_sound
+  jsr pently_start_sound
   rts
 .endproc
   

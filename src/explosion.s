@@ -97,9 +97,9 @@ isNTSC:
   sta explodeY,y
 
   lda #SFX_BOOM_NOISE
-  jsr start_sound
+  jsr pently_start_sound
   lda #SFX_BOOM_SQUARE
-  jmp start_sound
+  jmp pently_start_sound
 .endproc
 
 

@@ -59,7 +59,7 @@ loop:
   ldx oam_used
   jsr ppu_clear_oam
   jsr buildBGUpdate
-  jsr update_sound
+  jsr pently_update
 
   lda nmis
 :

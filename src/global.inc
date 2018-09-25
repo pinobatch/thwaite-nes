@@ -160,8 +160,9 @@ SFX_ALERT_B = 5
 SFX_LAUNCH = 6
 SFX_BOOM_SQUARE = 7
 SFX_BOOM_NOISE = 8
-; sound methods
-.global init_sound, start_sound, update_sound, init_music, stop_music
+; Pently 3 sound methods
+.global pently_init, pently_start_sound, pently_update
+.global pently_start_music, pently_stop_music
 
 ; cutscene fields
 .global character_name_offset, character_name0

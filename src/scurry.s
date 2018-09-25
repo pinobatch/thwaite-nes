@@ -117,9 +117,9 @@ notBetterSlot:
   lda #4
   sta lastExclSoundTime
   lda #SFX_ALERT_A
-  jsr start_sound
+  jsr pently_start_sound
   lda #SFX_ALERT_B
-  jsr start_sound
+  jsr pently_start_sound
 noExclSound:
 
   pla

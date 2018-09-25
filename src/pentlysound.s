@@ -23,7 +23,7 @@
 .import periodTableLo, periodTableHi
 .importzp psg_sfx_state  ; a 32 byte buffer in zp?
 .import update_music, update_music_ch, music_playing, psg_sound_table
-.export init_sound, start_sound, update_sound, soundBSS
+.export pently_init, pently_start_sound, pently_update, soundBSS
 
 SNDCHN = $4015
 
@@ -62,9 +62,9 @@ SOUND_NTSC_ONLY = 0
 ;;
 ; Initializes all sound channels.
 ; Use it at the start of a program or as a "panic button" before
-; entering a long stretch of code where you don't update_sound.
+; entering a long stretch of code where you don't pently_update.
 ;
-.proc init_sound
+.proc pently_init
   lda #$0F
   sta SNDCHN
   lda #$30
@@ -99,7 +99,7 @@ SOUND_NTSC_ONLY = 0
 ;
 ; @param A sound effect number (0-63)
 ;
-.proc start_sound
+.proc pently_start_sound
 snddatalo = 0
 snddatahi = 1
 sndchno = 2
@@ -162,7 +162,7 @@ ch_not_full:
 ;;
 ; Updates sound effect channels.
 ;
-.proc update_sound
+.proc pently_update
   jsr update_music
   ldx #12
 loop:

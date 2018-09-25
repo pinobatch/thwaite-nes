@@ -109,7 +109,7 @@ copypal:
 
   ;use this when testing a new song
 ;  lda #4
-;  jsr init_music
+;  jsr pently_start_music
 
 loop:
   lda nmis
@@ -121,7 +121,7 @@ loop:
   ldy #0
   clc
   jsr ppu_screen_on
-  jsr update_sound
+  jsr pently_update
   jsr read_pads
   jsr title_detect_mice
 
@@ -204,7 +204,7 @@ loop:
   ldx #BG_ON|OBJ_ON
   stx PPUMASK
 
-  jsr update_sound
+  jsr pently_update
   jsr read_pads
   jsr title_detect_mice
 
