@@ -10,6 +10,7 @@
 /nsfmap.txt
 __pycache__/
 *.pyc
+thwaite.nes
 
 # this is NES homebrew, not DSiWare
 *.DS_Store
