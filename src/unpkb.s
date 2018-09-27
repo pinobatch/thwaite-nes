@@ -35,7 +35,7 @@ PKB_outport = $2007         ;NES PPU data register
 PKB_source  = $00
 PKB_len     = $02
 
-.segment "CODE0"
+.segment "LIBCODE"
 
 ;
 ; PKB_unpackblk

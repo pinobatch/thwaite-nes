@@ -23,7 +23,7 @@
 il = $AF
 
 .export cut_scripts
-.segment "RODATA0"
+.segment "LIBDATA"
 cut_scripts:
   ; 0-7: perfect run scripts
   .addr perfect_sun_script, perfect_mon_script, perfect_tue_script

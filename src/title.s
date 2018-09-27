@@ -26,12 +26,12 @@
 
 B_TO_RESET = 0
 
-.segment "CODE0"
+.segment "LIBCODE"
 ;;
 ; Displays the text file pointed to at (0)
 ; starting at (2, 3) on nametable $2000.
 ; In a call-gated environment, the text data must be in the same
-; segment as RODATA0.
+; segment as LIBDATA.
 .proc display_textfile
 src = 0
 dstLo = 2
@@ -543,7 +543,7 @@ title_palette:
 mouse_icon_x:
   .byt 92, 140
 
-.segment "RODATA0"
+.segment "LIBDATA"
 title_pkb:
   .incbin "src/title.pkb"
 todo_txt:

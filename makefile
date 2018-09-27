@@ -39,10 +39,10 @@ imgdir = tilesets
 # the name of the shell on Windows and not defined on UNIX.
 ifdef COMSPEC
 DOTEXE:=.exe
-PY:=py
+PY:=py -3
 else
 DOTEXE:=
-PY:=
+PY:=python3
 endif
 
 objlistntsc = $(foreach o,$(objlist),$(objdir)/$(o).o)
@@ -95,7 +95,7 @@ $(objdir)/practice.o: src/practice.txt
 $(objdir)/ntscPeriods.s: tools/mktables.py
 	$(PY) $< period $@
 
-map.txt $(title).prg: nes.ini $(objlistntsc)
+map.txt $(title).prg: nrom256.x $(objlistntsc)
 	$(LD65) -o $(title).prg -m map.txt -C $^
 
 $(objdir)/%.chr: $(imgdir)/%.png

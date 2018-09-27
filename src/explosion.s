@@ -43,7 +43,7 @@ EXPLOSION_XMIRROR = 1
 ; they're in x, x^$10, and x, with the bottom row vertically flipped.
 EXPLOSION_YMIRROR = 1
 
-.segment "CODE0"
+.segment "LIBCODE"
 ;;
 ; Sets all explosions inactive.
 ; Does not modify memory otherwise.

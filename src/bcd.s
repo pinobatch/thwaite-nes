@@ -9,6 +9,7 @@
 ;
 .export bcd8bit
 
+.segment "LIBCODE"
 .macro bcd8bit_iter value
   .local skip
   cmp value
@@ -23,12 +24,13 @@ skip:
 ; in no more than 84 cycles.
 ; @param a the number to change
 ; @return a: low digit; 0: upper digits as nibbles
+; No other memory or register is touched.
 .proc bcd8bit
-highDigits = 0
-  pha
-  lda #0
-  sta 0
-  pla
+highDigits = $00
+  ; First clear out two bits of highDigits.  (The conversion will
+  ; fill in the other six.)
+  asl highDigits
+  asl highDigits
 
   ; Each iteration takes 11 if subtraction occurs or 10 if not.
   ; But if 80 is subtracted, 40 and 20 aren't, and if 200 is

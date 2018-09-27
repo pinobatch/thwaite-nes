@@ -27,7 +27,7 @@
 ;
 
 .include "global.inc"
-.segment "CODE0"
+.segment "LIBCODE"
 
 ;;
 ; Multiplies two 8-bit factors to produce a 16-bit product
@@ -266,7 +266,7 @@ notAngle0:
 .endproc
 
 
-.segment "RODATA0"
+.segment "LIBDATA"
 
 ; Tangents of angles between the ordinary angles, used by getAngle.
 ; you can make trig tables even in windows calculator

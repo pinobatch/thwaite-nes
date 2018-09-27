@@ -47,7 +47,7 @@ actor_detective = variable_actor_ids + 1
 actor_laidback = variable_actor_ids + 2
 cutscene_actors: .res 4
 
-.segment "CODE0"
+.segment "LIBCODE"
 
 .proc load_cutscene_bg
   lda #$FD
@@ -271,7 +271,7 @@ bail:
   pha
   rts
 .pushseg
-.segment "RODATA0"
+.segment "LIBDATA"
 handlers:
   .addr cut_handle_state_script-1
   .addr cut_handle_state_wait_a-1
@@ -593,7 +593,7 @@ randpull3:
 .endproc
 
 
-.segment "RODATA0"
+.segment "LIBDATA"
 
 cutscene_pkb:
   .incbin "src/cutscene.pkb"

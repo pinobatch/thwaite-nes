@@ -10,7 +10,7 @@
 .export getTVSystem
 .importzp nmis
 
-.segment "CODE0"
+.segment "LIBCODE"
 .align 32  ; ensure that branches do not cross a page boundary
 
 ;;

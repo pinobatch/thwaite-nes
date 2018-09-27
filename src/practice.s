@@ -23,7 +23,7 @@
 .include "nes.inc"
 .include "global.inc"
 
-.segment "RODATA0"
+.segment "LIBDATA"
 practice_txt:
   .incbin "src/practice.txt"
   .byt 0

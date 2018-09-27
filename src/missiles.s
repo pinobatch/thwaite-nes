@@ -82,7 +82,7 @@ crosshairDYHi: .res 2
 timeTillSalvo: .res 1
 salvoLeft: .res 1
 
-.segment "CODE0"
+.segment "LIBCODE"
 .proc clearAllMissiles
   ldx #NUM_MISSILES-1
   lda #0

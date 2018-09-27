@@ -135,7 +135,7 @@ bail:
   rts
 .endproc
 
-.segment "CODE0"
+.segment "LIBCODE"
 .proc clearAllSmoke
   ldy #NUM_SMOKE - 1
   lda #$FF

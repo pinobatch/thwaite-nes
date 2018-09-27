@@ -54,7 +54,7 @@ exclTime: .res NUM_EXCLS
 exclX:    .res NUM_EXCLS
 lastExclSoundTime: .res 1
 
-.segment "CODE0"
+.segment "LIBCODE"
 .proc initVillagers
   ldx #NUM_VILLAGERS - 1
   stx lastExclSoundTime
