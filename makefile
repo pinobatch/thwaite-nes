@@ -12,7 +12,7 @@ title = thwaite
 version = 0.04wip
 objlist = main random levels smoke bg missiles explosion scurry \
           title practice cutscene cutscripts tips \
-          math bcd kinematics unpkb pads mouse ppuclear \
+          math bcd kinematics unpkb undte pads mouse ppuclear popslide16 \
           paldetect pentlysound pentlymusic musicseq ntscPeriods
 
 CC65 = /usr/local/bin
@@ -86,10 +86,17 @@ $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/global.inc
 $(objdir)/%.o: $(objdir)/%.s
 	$(AS65) $(CFLAGS65) $< -o $@
 
+# headers
+
+$(objdir)/bg.o $(objdir)/popslide.o: $(srcdir)/popslide.inc
+$(objdir)/popslide.o: $(srcdir)/popslideinternal.inc
+
 # incbins
 
 $(objdir)/title.o: src/title.pkb
 $(objdir)/cutscene.o: src/cutscene.pkb
+
+# data conversion
 
 $(objdir)/ntscPeriods.s: tools/mktables.py
 	$(PY) $< period $@
@@ -104,6 +111,8 @@ $(objdir)/cutscripts.s: \
 
 map.txt $(title).prg: nrom256.x $(objlistntsc)
 	$(LD65) -o $(title).prg -m map.txt -C $^
+
+# graphics
 
 $(objdir)/%.chr: $(imgdir)/%.png
 	$(PY) tools/pilbmp2nes.py $< $@

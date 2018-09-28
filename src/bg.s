@@ -22,6 +22,7 @@
 
 .include "nes.inc"
 .include "global.inc"
+.include "popslide.inc"
 
 BG_GRASSNUM = $C0
 TILE_BETWEEN_HOUSES = $8F
@@ -46,9 +47,9 @@ BG_GRASSCOLON = $A8
 BG_GRASSI = $AA
 
 
-houseXferBuf = $0100
-houseXferDstHi = $0140
-houseXferDstLo = $0141
+houseXferBuf = $010B
+houseXferDstHi = $0108
+houseXferDstLo = $0109
 
 .segment "BSS"
 
@@ -72,6 +73,7 @@ firstDestroyedHouse: .res 1
 
 .segment "CODE"
 .proc setupGameBG
+  jsr popslide_init
   lda #BG_DIRTY_HOUSES|BG_DIRTY_STATUS
   sta bgDirty
   lda #VBLANK_NMI
@@ -583,23 +585,14 @@ copynamedone:
 .proc blitBGUpdate
   lda houseXferDstHi
   beq noblit
-  ldx houseXferDstLo
-  clc
-  sta PPUADDR
-  stx PPUADDR
-  ldx #0
-  stx houseXferDstHi
-loop:
-  .repeat 8, I
-    lda houseXferBuf+I,x
-    sta PPUDATA
-  .endrepeat
-  txa
-  adc #8
-  tax
-  cpx #64
-  bcc loop
-noblit:
+    lda #$FF
+    sta houseXferBuf+64
+    lda #$3F
+    sta houseXferBuf-1
+    jsr popslide_blit
+    lda #0
+    sta houseXferDstHi
+  noblit:
 .if ::BG_USE_DEBUGHEX
   lda #$23
   sta PPUADDR
