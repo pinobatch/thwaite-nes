@@ -22,6 +22,7 @@
 
 .include "nes.inc"
 .include "global.inc"
+.include "popslide.inc"
 .import cut_scripts
 
 .segment "ZEROPAGE"
@@ -40,7 +41,7 @@ PRESS_A_MARKER_Y = 184
 FADEIN_SPEED = 3
 FADEIN_START = $3F
 FADEOUT_SPEED = 4
-FADEOUT_END = $20
+FADEOUT_END = $30
 HOUSES_TOPLEFT = $2181
 DIALOGUE_TOPLEFT = $22A2
 
@@ -61,6 +62,7 @@ cutscene_actors: .res 4
   sta cutFadeDir
   lda #FADEIN_START
   sta cutFadeAmount
+  jsr popslide_init
 
   ; turn off rendering
   lda #VBLANK_NMI
@@ -169,30 +171,28 @@ vw1:
 
 main_loop:
   jsr pently_update
-  
-  lda nmis
-  vw:
-    cmp nmis
-    beq vw
-  
 
-  lda #>OAM
-  ldx #0
-  stx OAMADDR
-  sta OAM_DMA
-
-  ; copy faded palette
   lda cutFadeAmount
   beq doneFading
-    and #$F0
-    sta 0
+    and #$30
+    sta $00
+    ldx popslide_used
     lda #$3F
-    sta PPUADDR
-    stx PPUADDR
+    sta popslide_buf,x
+    lda #$01
+    sta popslide_buf+1,x
+    tay
+    lda #$1E
+    sta popslide_buf+2,x
+    txa
+    clc
+    adc #34
+    sta popslide_used
+
     palloop:
-      lda cutscene_palette,x
+      lda cutscene_palette,y
       sec
-      sbc 0
+      sbc $00
       bpl palNotNeg
       cmp #$F0
       bne palNotF0
@@ -201,15 +201,26 @@ main_loop:
     palNotF0:
       lda #$0F
     palNotNeg:
-      sta PPUDATA
+      sta popslide_buf+3,x
       inx
-      cpx #$20
+      iny
+      cpy #$20
       bcc palloop
     bcs skipHandleScript
   doneFading:
     jsr cut_handle_state
   skipHandleScript:
 
+  lda nmis
+  vw:
+    cmp nmis
+    beq vw
+
+  lda #>OAM
+  ldy #0
+  sty OAMADDR
+  sta OAM_DMA
+  jsr popslide_terminate_blit
   lda #VBLANK_NMI|BG_1000|OBJ_1000
   ldy #0
   ldx #0
@@ -333,12 +344,19 @@ retry_y0:
   beq is_dollar
 
     ; Not dollar means it's a single character to write
-    ldx cutscene_vram_dst_hi
-    stx PPUADDR
-    ldx cutscene_vram_dst_lo
+    ldx popslide_used
+    sta popslide_buf+3,x
+    lda cutscene_vram_dst_hi
+    sta popslide_buf+0,x
+    lda cutscene_vram_dst_lo
     inc cutscene_vram_dst_lo
-    stx PPUADDR
-    sta PPUDATA
+    sta popslide_buf+1,x
+    lda #0
+    sta popslide_buf+2,x
+    txa
+    clc
+    adc #4
+    sta popslide_used
     rts
   is_dollar:
 
@@ -411,19 +429,19 @@ no_show_marker:
 .endproc
 
 .proc cut_handle_state_cls
-  lda #$22
-  sta PPUADDR
-  lda cutscene_vram_dst_lo
-  sta PPUADDR
-  ldy #6
+  ldx popslide_used
+  txa
+  clc
+  adc #4
+  sta popslide_used
+  lda #29|$40
+  sta popslide_buf+2,x
   lda #' '
-clrloop:
-  .repeat 5
-  sta PPUDATA
-  .endrepeat
-  dey
-  bne clrloop
+  sta popslide_buf+3,x
+  lda #>DIALOGUE_TOPLEFT
+  sta popslide_buf+0,x
   lda cutscene_vram_dst_lo
+  sta popslide_buf+1,x
   clc
   adc #32
   sta cutscene_vram_dst_lo
@@ -435,20 +453,11 @@ clrloop:
 .endproc
 
 .proc cut_handle_state_new_graph
-  lda #>DIALOGUE_TOPLEFT
-  sta PPUADDR
-  sta cutscene_vram_dst_hi
-  lda #<DIALOGUE_TOPLEFT - 32 - 1
-  sta PPUADDR
-  lda #<DIALOGUE_TOPLEFT
-  sta cutscene_vram_dst_lo
-  lda #'<'
-  sta PPUDATA
+src = 0
+
+  ; Fetch the speaker's name
   ldy #0
-  
-  ; Fetch the speaker
   lda (script_ptr),y
-  sta $4444
   inc script_ptr
   bne :+
     inc script_ptr+1
@@ -464,20 +473,50 @@ clrloop:
   tax
   lda #<character_name0
   adc character_name_offset,x
-  sta 0
+  sta src
   lda #>character_name0
   adc #0
-  sta 1
+  sta src+1
+
+  ; Form a Popslide packet of the following form:
+  ; 0-1: address; 2: strlen+1; 3: '<'; 4:4+strlen: name; 4+strlen: '>'
+  ; Because names are nul-terminated, the length shall be written last.
+
+  ; Write address
+  ldx popslide_used
+  lda #>DIALOGUE_TOPLEFT
+  sta popslide_buf+0,x
+  sta cutscene_vram_dst_hi
+  lda #<DIALOGUE_TOPLEFT - 32 - 1
+  sta popslide_buf+1,x
+  lda #<DIALOGUE_TOPLEFT
+  sta cutscene_vram_dst_lo
+
+  ; Write name
+  lda #'<'
+  sta popslide_buf+3,x
   ldy #0
-loop:
-  lda (0),y
-  beq nul
-  sta PPUDATA
-  iny
-  bne loop
-nul:
+  loop:
+    lda (0),y
+    beq nul
+    sta popslide_buf+4,x
+    inx
+    iny
+    bne loop
+  nul:
   lda #'>'
-  sta PPUDATA
+  sta popslide_buf+4,x
+
+  ; Write length
+  txa
+  clc
+  adc #5
+  ldx popslide_used
+  sta popslide_used
+  iny
+  tya
+  sta popslide_buf+2,x
+
   lda #CUT_STATE_SCRIPT
   sta gameState
   rts

@@ -86,9 +86,9 @@ $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/global.inc
 $(objdir)/%.o: $(objdir)/%.s
 	$(AS65) $(CFLAGS65) $< -o $@
 
-# headers
+# extra headers
 
-$(objdir)/bg.o $(objdir)/popslide.o: $(srcdir)/popslide.inc
+$(objdir)/bg.o $(objdir)/cutscene.o $(objdir)/popslide.o: $(srcdir)/popslide.inc
 $(objdir)/popslide.o: $(srcdir)/popslideinternal.inc
 
 # incbins

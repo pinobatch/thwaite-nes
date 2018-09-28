@@ -24,7 +24,7 @@ popslide_nextpacket:
   pla
   sta PPUADDR
 
-  ; Get direction
+  ; Get direction from bit 7
   ldx #VBLANK_NMI
   pla
   bpl :+
@@ -36,7 +36,7 @@ popslide_nextpacket:
   ; Calculate length
   eor #$7F
   tax
-  cmp #$40
+  cmp #$40  ; bit 6: is run
   and #$0F
   bcc isrun
   asl a
