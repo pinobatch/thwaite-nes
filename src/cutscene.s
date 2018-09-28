@@ -47,7 +47,7 @@ actor_detective = variable_actor_ids + 1
 actor_laidback = variable_actor_ids + 2
 cutscene_actors: .res 4
 
-.segment "LIBCODE"
+.segment "CODE"
 
 .proc load_cutscene_bg
   lda #$FD
@@ -271,7 +271,7 @@ bail:
   pha
   rts
 .pushseg
-.segment "LIBDATA"
+.segment "RODATA"
 handlers:
   .addr cut_handle_state_script-1
   .addr cut_handle_state_wait_a-1
@@ -593,7 +593,7 @@ randpull3:
 .endproc
 
 
-.segment "LIBDATA"
+.segment "RODATA"
 
 cutscene_pkb:
   .incbin "src/cutscene.pkb"
@@ -668,7 +668,7 @@ character_name9:  .byt "Staisy",0  ; Player 2
 character_name10: .byt "Thad",0
 character_name11: .byt "Oliver",0
 character_name12: .byt "L.T.D.",0  ; Traveling musician
-character_name13: .byt "Pino",0    ; Hidden TAS character
+character_name13: .byt "Pino",0    ; Voice on phone
 character_name14: .byt "???",0
 
 ; $00 for male, $80 for female

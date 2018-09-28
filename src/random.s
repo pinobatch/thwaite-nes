@@ -23,7 +23,7 @@ rand2: .res 1
 rand3: .res 1
 lruTargets: .res NUM_BUILDINGS
 
-.segment "CODE"
+.segment "LIBCODE"
 ;; random
 ; Uses the crc32 polynomial to generate Y
 ; pseudorandom bits as the low_order bits of rand3.
@@ -53,6 +53,7 @@ lruTargets: .res NUM_BUILDINGS
   rts
 .endproc
 
+.segment "CODE"
 LRU_BITS = 3
 
 .proc chooseRandomTarget

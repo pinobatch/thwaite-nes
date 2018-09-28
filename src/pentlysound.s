@@ -57,7 +57,7 @@ SOUND_NTSC_ONLY = 0
 .importzp tvSystem
 .endif
 
-.segment "CODE"
+.segment "PENTLYCODE"
 
 ;;
 ; Initializes all sound channels.

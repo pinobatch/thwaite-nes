@@ -43,7 +43,7 @@ EXPLOSION_XMIRROR = 1
 ; they're in x, x^$10, and x, with the bottom row vertically flipped.
 EXPLOSION_YMIRROR = 1
 
-.segment "LIBCODE"
+.segment "CODE"
 ;;
 ; Sets all explosions inactive.
 ; Does not modify memory otherwise.
@@ -57,7 +57,6 @@ loop:
   jmp clearAllSmoke
 .endproc
 
-.segment "CODE"
 ;;
 ; Makes an explosion at (x, y).
 ; LOCAL-8 compliant

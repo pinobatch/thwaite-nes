@@ -4,9 +4,13 @@
 cur_mbuttons: .res 2
 new_mbuttons: .res 2
 
-.segment "CODE"
+.segment "LIBCODE"
 ;;
-; @param X player number
+; Reads the Super NES Mouse after the 8 leading bits (corresponding
+; to the controller) are already read.
+; @param X controller port (0 or 1)
+; @return cur_mbuttons[x] and new_mbuttons[x]updated;
+; $01: sig, , and ; $02: y; $03: x
 .proc read_mouse
   lda #1
   sta 1
@@ -36,6 +40,10 @@ new_mbuttons: .res 2
   rts
 .endproc
 
+;;
+; Changes the sensitivity of the Super NES Mouse by sending a clock
+; while strobe is true.
+; @param X controller port (0 or 1)
 .proc mouse_change_sensitivity
   lda #1
   sta $4016

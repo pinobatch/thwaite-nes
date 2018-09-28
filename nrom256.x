@@ -13,22 +13,23 @@ MEMORY {
   HEADER:   start = 0, size = $0010, type = ro, file = %O, fill=yes, fillval=$00;
   RAM:      start = $0300, size = $0500, type = rw;
 
-  # As of Thwaite 0.04, leave first 8 KiB of PRG free for a copy of
-  # CHR ROM in case we go to press on a CHR RAM cart
-  CHREMPTY: start = $8000, size = $2000, type = ro, file = %O, fill=yes, fillval=$FF;
-  ROM0:     start = $A000, size = $2000, type = ro, file = %O, fill=yes, fillval=$FF;
+  # Organize so that library code is in its own bank in case
+  # Thwaite 0.4 goes to press on a multicart
+  ROM0:     start = $8000, size = $4000, type = ro, file = %O, fill=yes, fillval=$FF;
   ROM7:     start = $C000, size = $4000, type = ro, file = %O, fill=yes, fillval=$FF;
 }
 
 SEGMENTS {
-  INESHDR:  load = HEADER, type = ro, align = $10;
-  ZEROPAGE: load = ZP, type = zp;
-  BSS:      load = RAM, type = bss, define = yes, align = $100;
-  LIBCODE:  load = ROM0, type = ro, align = $100, optional=1;
-  LIBDATA:  load = ROM0, type = ro, align = $100, optional=1;
-  CODE:     load = ROM7, type = ro, align = $100;
-  RODATA:   load = ROM7, type = ro, align = $100;
-  VECTORS:  load = ROM7, type = ro, start = $FFFA;
+  INESHDR:    load = HEADER, type = ro, align = $10;
+  ZEROPAGE:   load = ZP, type = zp;
+  BSS:        load = RAM, type = bss, define = yes, align = $100;
+  CODE:       load = ROM0, type = ro, align = $10;
+  RODATA:     load = ROM0, type = ro, align = $10;
+  LIBCODE:    load = ROM7, type = ro, align = $20, optional=1;
+  LIBDATA:    load = ROM7, type = ro, align = $10, optional=1;
+  PENTLYCODE: load = ROM7, type = ro, optional=1;
+  PENTLYDATA: load = ROM7, type = ro, optional=1;
+  VECTORS:    load = ROM7, type = ro, start = $FFFA;
 }
 
 FILES {

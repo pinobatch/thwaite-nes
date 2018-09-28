@@ -82,7 +82,7 @@ crosshairDYHi: .res 2
 timeTillSalvo: .res 1
 salvoLeft: .res 1
 
-.segment "LIBCODE"
+.segment "CODE"
 .proc clearAllMissiles
   ldx #NUM_MISSILES-1
   lda #0
@@ -111,8 +111,6 @@ salvoLeft: .res 1
   sta crosshairXHi+1
   jmp clearExplosions
 .endproc
-
-.segment "CODE"
 
 ; To draw a missile:
 ; 1. Look up its angle. (Straight left and right are not defined.)
@@ -1302,6 +1300,6 @@ missileTileFlip:
 missileTileHotspotY:
   .byt 6
 missileTileHotspotX:  
-  .byt 6, 1, 1, 6
+  .byt    6, 1, 1, 6
 siloX:
   .byt 64, 192

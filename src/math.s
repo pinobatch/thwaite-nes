@@ -37,8 +37,8 @@
 ; @return high 8 bits in A; low 8 bits in $0000
 ;         Y and $0001 are trashed; X is untouched
 .proc mul8
-factor2 = 1
-prodlo = 0
+factor2 = $01
+prodlo = $00
 
   ; Factor 1 is stored in the lower bits of prodlo; the low byte of
   ; the product is stored in the upper bits.
@@ -47,17 +47,17 @@ prodlo = 0
   sty factor2
   lda #0
   ldy #8
-loop:
-  ; At the start of the loop, one bit of prodlo has already been
-  ; shifted out into the carry.
-  bcc noadd
-  clc
-  adc factor2
-noadd:
-  ror a
-  ror prodlo  ; pull another bit out for the next iteration
-  dey         ; inc/dec don't modify carry; only shifts and adds do
-  bne loop
+  loop:
+    ; At the start of the loop, one bit of prodlo has already been
+    ; shifted out into the carry.
+    bcc noadd
+      clc
+      adc factor2
+    noadd:
+    ror a
+    ror prodlo  ; pull another bit out for the next iteration
+    dey         ; inc/dec don't modify carry; only shifts and adds do
+    bne loop
   rts
 .endproc
 
@@ -65,8 +65,8 @@ noadd:
 ; Computes 256*a/y.  Useful for finding slopes.
 ; 0 and 1 are trashed.
 .proc getSlope1
-quotient = 0
-divisor = 1
+quotient = $00
+divisor = $01
 
   sty divisor
   ldy #1  ; when this gets ROL'd eight times, the loop ends
@@ -102,11 +102,11 @@ nosub:
 ;         2, 3: point reflected into first octant
 ;         Trashes Y and nothing else.
 .proc getAngle
-x1 = 0
-y1 = 1
-x2 = 2
-y2 = 3
-flags = 4
+x1 = $00
+y1 = $01
+x2 = $02
+y2 = $03
+flags = $04
 
   lda y2
   cmp y1

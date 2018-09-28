@@ -11,6 +11,8 @@
 .include "global.inc"
 .export ppu_clear_nt, ppu_clear_oam, ppu_screen_on, ppu_wait_vblank
 
+.segment "LIBCODE"
+
 ;;
 ; Clears a nametable to a given tile number and attribute value.
 ; (Turn off rendering in PPUMASK and set the VRAM address increment

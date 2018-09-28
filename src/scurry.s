@@ -54,7 +54,7 @@ exclTime: .res NUM_EXCLS
 exclX:    .res NUM_EXCLS
 lastExclSoundTime: .res 1
 
-.segment "LIBCODE"
+.segment "CODE"
 .proc initVillagers
   ldx #NUM_VILLAGERS - 1
   stx lastExclSoundTime
@@ -78,8 +78,6 @@ eachClog:
   bpl eachClog
   jmp warpVillagersToTargets
 .endproc
-
-.segment "CODE"
 
 .proc makeExcl
 xpos = 0

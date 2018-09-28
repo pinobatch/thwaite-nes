@@ -45,7 +45,7 @@ FRAMES_PER_MINUTE_PAL = 3000
 FRAMES_PER_MINUTE_NTSC = 3606
 
 
-.segment "RODATA"
+.segment "PENTLYDATA"
 
 fpmLo:
   .byt <FRAMES_PER_MINUTE_NTSC, <FRAMES_PER_MINUTE_PAL
@@ -58,7 +58,7 @@ silentPattern:
 durations:
   .byt 1, 2, 3, 4, 6, 8, 12, 16
 
-.segment "CODE"
+.segment "PENTLYCODE"
 .proc pently_start_music
   asl a
   tax

@@ -12,7 +12,7 @@
 
 .include "pentlyseq.inc"
 
-.segment "RODATA"
+.segment "PENTLYDATA"
 
 ; Sound effect map for Thwaite
 ;  0 MIRV splitting into three ordinary missiles
@@ -309,8 +309,7 @@ hr4_drums:
 ;
 ; This is melodies from the third movement of Beethoven's
 ; "Pathetique" combined with rhythms from ACPG 5am.
-; At the time I transcribed this, there were about 400 bytes left
-; in the RODATA segment of the PRG ROM.
+; When I transcribed this, there were about 400 bytes of free ROM.
 
 hr5_conductor:
   setTempo 300

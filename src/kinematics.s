@@ -9,6 +9,7 @@
 ;
 .include "global.inc"
 
+.segment "LIBCODE"
 ;; 
 ; Applies acceleration, braking, and speed limit.
 ; XY untouched.

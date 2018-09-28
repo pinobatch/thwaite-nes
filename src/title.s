@@ -32,8 +32,6 @@ B_TO_RESET = 0
 ;;
 ; Displays the text file pointed to at (0)
 ; starting at (2, 3) on nametable $2000.
-; In a call-gated environment, the text data must be in the same
-; segment as LIBDATA.
 .proc display_textfile
 src = 0
 dstLo = 2
