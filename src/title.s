@@ -24,6 +24,8 @@
 .include "nes.inc"
 .include "global.inc"
 
+.global todo_txt
+
 B_TO_RESET = 0
 
 .segment "LIBCODE"
@@ -543,10 +545,5 @@ title_palette:
 mouse_icon_x:
   .byt 92, 140
 
-.segment "LIBDATA"
 title_pkb:
   .incbin "src/title.pkb"
-todo_txt:
-  .incbin "todo.txt"
-  .byt 0
-

@@ -29,10 +29,8 @@ def lines_to_docs(lines):
         # hash in first column as first thing on page: comment
         if line.startswith("#") and not cur_page: continue
 
-        # blank line is added only if previous line exists and is
-        # nonblank
-        if linestrip == '':
-            if not cur_page or cur_page[-1] == '': continue
+        # skip initial blank lines
+        if linestrip == '' and not cur_page: continue
 
         cur_page.append(line)
 

@@ -22,11 +22,8 @@
 
 .include "nes.inc"
 .include "global.inc"
+.global practice_txt
 
-.segment "LIBDATA"
-practice_txt:
-  .incbin "src/practice.txt"
-  .byt 0
 .segment "ZEROPAGE"
 isPractice:   .res 1
 practiceSide: .res 1

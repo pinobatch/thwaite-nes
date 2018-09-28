@@ -88,9 +88,8 @@ $(objdir)/%.o: $(objdir)/%.s
 
 # incbins
 
-$(objdir)/title.o: todo.txt src/title.pkb
+$(objdir)/title.o: src/title.pkb
 $(objdir)/cutscene.o: src/cutscene.pkb
-$(objdir)/practice.o: src/practice.txt
 
 $(objdir)/ntscPeriods.s: tools/mktables.py
 	$(PY) $< period $@
@@ -100,6 +99,7 @@ $(objdir)/cutscripts.s: \
 	$(PY) tools/paginate.py \
 	-t cutscripts $(srcdir)/cutscripts.txt \
 	-t tips $(srcdir)/tips.txt \
+	-t text $(srcdir)/texts.txt \
 	-o $@
 
 map.txt $(title).prg: nrom256.x $(objlistntsc)
