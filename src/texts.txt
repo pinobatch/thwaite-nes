@@ -17,7 +17,7 @@ Side: Left  Right
 == todo_txt ==
 Thwaite 0.04-wip
 
-© 2011 Damian YERRICK
+© 2011,2018 Damian YERRICK
 <thwaite@pineight.com>
 
 Comes with ABSOLUTELY NO 
