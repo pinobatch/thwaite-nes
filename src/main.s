@@ -227,7 +227,6 @@ notPaused:
   ; Draw sprites
   ldx #0
   stx oam_used
-  stx $4444
 drawAllCrosshairs:
   jsr drawCrosshairPlayerX
   inx

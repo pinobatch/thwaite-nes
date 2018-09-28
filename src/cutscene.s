@@ -1,7 +1,7 @@
 ; cutscene.s
 ; Cut scene code and character data for Thwaite
 
-;;; Copyright (C) 2011 Damian Yerrick
+;;; Copyright (C) 2011-2018 Damian Yerrick
 ;
 ;   This program is free software; you can redistribute it and/or
 ;   modify it under the terms of the GNU General Public License
@@ -32,10 +32,17 @@ cutscene_vram_dst_hi: .res 1
 ; cutStateTimer = tipTimeLeft
 
 CUT_STATE_SCRIPT = 0
-CUT_STATE_WAIT_A = 1
-CUT_STATE_CLS = 2
-CUT_STATE_NEW_GRAPH = 3
+CUT_STATE_WAIT_A = 2
+CUT_STATE_CLS = 4
+CUT_STATE_NEW_GRAPH = 6
+
 PRESS_A_MARKER_Y = 184
+FADEIN_SPEED = 3
+FADEIN_START = $3F
+FADEOUT_SPEED = 4
+FADEOUT_END = $20
+HOUSES_TOPLEFT = $2181
+DIALOGUE_TOPLEFT = $22A2
 
 .segment "BSS"
 
@@ -50,9 +57,9 @@ cutscene_actors: .res 4
 .segment "CODE"
 
 .proc load_cutscene_bg
-  lda #$FD
+  lda #<-FADEIN_SPEED
   sta cutFadeDir
-  lda #$3F
+  lda #FADEIN_START
   sta cutFadeAmount
 
   ; turn off rendering
@@ -77,37 +84,37 @@ cutscene_actors: .res 4
   ; this part uses vertical nametable writes
   lda #VBLANK_NMI|VRAM_DOWN
   sta PPUCTRL
-blown_up_mod:
-  lda housesStanding+3,y
-  bne this_one_not_blown_up
-  sty 0
-  tya
-  asl a
-  asl a
-  ora #$81
-  adc 0
-  sta 0
-  ldx #3
-hideHouseLoop:
-  lda #$21
-  sta PPUADDR
-  lda 0
-  inc 0
-  sta PPUADDR
-  lda #$00
-  sta PPUDATA
-  sta PPUDATA
-  txa
-  eor #$BB
-  sta PPUDATA
-  eor #$04
-  sta PPUDATA
-  dex
-  bpl hideHouseLoop
-this_one_not_blown_up:
+  blown_up_mod:
+    lda housesStanding+3,y
+    bne this_one_not_blown_up
+      sty 0
+      tya
+      asl a
+      asl a
+      ora #<HOUSES_TOPLEFT
+      adc 0
+      sta 0
+      ldx #3
+      hideHouseLoop:
+        lda #>HOUSES_TOPLEFT
+        sta PPUADDR
+        lda 0
+        inc 0
+        sta PPUADDR
+        lda #$00
+        sta PPUDATA
+        sta PPUDATA
+        txa
+        eor #$BB
+        sta PPUDATA
+        eor #$04
+        sta PPUDATA
+      dex
+      bpl hideHouseLoop
+    this_one_not_blown_up:
+    dey
+    bpl blown_up_mod
 
-  dey
-  bpl blown_up_mod
   lda #VBLANK_NMI
   sta PPUCTRL
 
@@ -119,15 +126,9 @@ oamcopyloop:
   dex
   bne oamcopyloop
   lda cutscene_init_oam
-  sta OAM
+  sta OAM+0
   ldx #cutscene_init_oam_end - cutscene_init_oam
-  lda #$F0
-oamendloop:
-  sta OAM,x
-  inx
-  bne oamendloop
-  
-  rts
+  jmp ppu_clear_oam
 .endproc
 
 .proc load_cutscene
@@ -148,111 +149,116 @@ vw1:
 
 ; Load the actors
   ldy #0
-load_actors_loop:
-  lda (script_ptr),y
-  sta cutscene_actors,y
-  iny
-  cpy #4
-  bcc load_actors_loop
+  load_actors_loop:
+    lda (script_ptr),y
+    sta cutscene_actors,y
+    iny
+    cpy #4
+    bcc load_actors_loop
   clc
   tya
   adc script_ptr
   sta script_ptr
   bcc :+
-  inc script_ptr+1
-:
+    inc script_ptr+1
+  :
   jsr cut_handle_state_new_graph
 
   lda #MUSIC_1600
   jsr pently_start_music
+
 main_loop:
   jsr pently_update
   
   lda nmis
-vw:
-  cmp nmis
-  beq vw
-
-  ; copy faded palette
-  lda cutFadeAmount
-  beq doneFading
-  and #$F0
-  sta 0
-  lda #$3F
-  sta PPUADDR
-  ldx #$00
-  stx PPUADDR
-palloop:
-  lda cutscene_palette,x
-  sec
-  sbc 0
-  bpl palNotNeg
-  cmp #$F0
-  bne palNotF0
-  lda #$02
-  bne palNotNeg
-palNotF0:
-  lda #$0F
-palNotNeg:
-  sta PPUDATA
-  inx
-  cpx #$20
-  bcc palloop
-  bcs skipHandleScript
-doneFading:
-  jsr cut_handle_state
-skipHandleScript:
+  vw:
+    cmp nmis
+    beq vw
+  
 
   lda #>OAM
   ldx #0
   stx OAMADDR
   sta OAM_DMA
+
+  ; copy faded palette
+  lda cutFadeAmount
+  beq doneFading
+    and #$F0
+    sta 0
+    lda #$3F
+    sta PPUADDR
+    stx PPUADDR
+    palloop:
+      lda cutscene_palette,x
+      sec
+      sbc 0
+      bpl palNotNeg
+      cmp #$F0
+      bne palNotF0
+      lda #$02
+      bne palNotNeg
+    palNotF0:
+      lda #$0F
+    palNotNeg:
+      sta PPUDATA
+      inx
+      cpx #$20
+      bcc palloop
+    bcs skipHandleScript
+  doneFading:
+    jsr cut_handle_state
+  skipHandleScript:
+
   lda #VBLANK_NMI|BG_1000|OBJ_1000
   ldy #0
+  ldx #0
   sec
   jsr ppu_screen_on
 
   jsr read_pads
   lda mouseEnabled+0
   beq no_read_mouse
-  ldx #0
-  jsr read_mouse
-no_read_mouse:
+    ldx #0
+    jsr read_mouse
+  no_read_mouse:
   lda new_keys
   and #KEY_START
   beq notStart
-  lda #4
-  sta cutFadeDir
-notStart:
+    lda #FADEOUT_SPEED
+    sta cutFadeDir
+  notStart:
 
-s0wait0:
-  bit $2002
-  bvs s0wait0
-s0wait1:
-  bit $2002
-  bmi s0waitfail
-  bvc s0wait1
+  ; Wait for sprite 0
+  s0wait0:
+    bit $2002
+    bvs s0wait0
+  s0wait1:
+    bit $2002
+    bmi s0waitfail
+    bvc s0wait1
   lda #VBLANK_NMI|BG_0000|OBJ_1000
   sta PPUCTRL
 s0waitfail:
 
+  ; Adjust fade amount
   lda cutFadeDir
   clc
   adc cutFadeAmount
   sta cutFadeAmount
   and cutFadeDir
   bpl notWrappedToNeg
-  lda #0
-  sta cutFadeAmount
-  sta cutFadeDir
-notWrappedToNeg:
+    lda #0
+    sta cutFadeAmount
+    sta cutFadeDir
+  notWrappedToNeg:
   
   lda cutFadeDir
-  bmi jmp_loop
-  lda cutFadeAmount
-  cmp #$20
-  bcs bail
-jmp_loop:
+  bmi not_fading_out
+    lda cutFadeAmount
+    cmp #FADEOUT_END
+    bcs bail
+  not_fading_out:
   jmp main_loop
 bail:
   jmp pently_stop_music
@@ -262,9 +268,7 @@ bail:
 .proc cut_handle_state
   lda #$FF
   sta OAM+cutscene_init_oam_end-cutscene_init_oam-4
-  lda gameState
-  asl a
-  tax
+  ldx gameState
   lda handlers+1,x
   pha
   lda handlers,x
@@ -282,68 +286,76 @@ handlers:
 
 .proc cut_handle_state_script
   ldy #0
+retry_y0:
   lda (script_ptr),y
   bne not_nul
 
-  ; The script stack (used for $ commands) is one level deep.  
-  lda stacked_script_ptr+1
-  beq stack_underflow
-  sta script_ptr+1
-  lda stacked_script_ptr
-  sta script_ptr
-  lda #0
-  sta stacked_script_ptr+1
-  beq cut_handle_state_script
-stack_underflow:
-
-  lda #CUT_STATE_WAIT_A
-  sta gameState
-  rts
-  
-not_nul:
+    ; The script stack (used for $ interpolation) is one level deep.
+    ; If there's no stacked script, null means end of cut scene,
+    ; so go to the wait for A press.  Otherwise we're at the end of
+    ; a character name, so resume the script.
+    lda stacked_script_ptr+1
+    beq goto_A_press
+    sta script_ptr+1
+    lda stacked_script_ptr
+    sta script_ptr
+    ; Y is still 0
+    sty stacked_script_ptr+1
+    beq retry_y0
+  not_nul:
 
   inc script_ptr
   bne :+
-  inc script_ptr+1
-:
+    inc script_ptr+1
+  :
   cmp #12
   bne not_formfeed
-  lda #CUT_STATE_WAIT_A
-  sta gameState
-  rts
-not_formfeed:
+  goto_A_press:
+    lda #CUT_STATE_WAIT_A
+    sta gameState
+    rts
+  not_formfeed:
 
   cmp #10
   bne not_newline
-  lda cutscene_vram_dst_lo
-  and #%11100000
-  clc
-  adc #34
-  sta cutscene_vram_dst_lo
-  bcc :+
-  inc cutscene_vram_dst_hi
-:
-  rts
-not_newline:
+    lda cutscene_vram_dst_lo
+    and #%11100000
+    clc
+    adc #32+(DIALOGUE_TOPLEFT & $1F)
+    sta cutscene_vram_dst_lo
+    bcc :+
+      inc cutscene_vram_dst_hi
+    :
+    rts
+  not_newline:
+
   cmp #'$'
   beq is_dollar
-  ldx cutscene_vram_dst_hi
-  stx PPUADDR
-  ldx cutscene_vram_dst_lo
-  inc cutscene_vram_dst_lo
-  stx PPUADDR
-  sta PPUDATA
-  rts
-is_dollar:
+
+    ; Not dollar means it's a single character to write
+    ldx cutscene_vram_dst_hi
+    stx PPUADDR
+    ldx cutscene_vram_dst_lo
+    inc cutscene_vram_dst_lo
+    stx PPUADDR
+    sta PPUDATA
+    rts
+  is_dollar:
+
+  ; Stack this script and load a character name
   lda (script_ptr),y
   pha
-  clc
-  lda script_ptr
-  adc #1
+
+  ; Stack 1 byte ahead
+  tya  ; Y still 0
+  sec
+  adc script_ptr
   sta stacked_script_ptr
-  lda script_ptr+1
-  adc #0
+  tya
+  adc script_ptr+1
   sta stacked_script_ptr+1
+
+  ; Load the character's name
   pla
   jsr cut_translate_actorid
   clc
@@ -366,39 +378,35 @@ is_dollar:
 no_show_marker:
   lda mouseEnabled
   beq not_pressed_lmb
-  lda new_mbuttons
-  and #MOUSE_L
-  bne pressed_lmb
-
-not_pressed_lmb:
+    lda new_mbuttons
+    and #MOUSE_L
+    bne pressed_A
+  not_pressed_lmb:
   lda #KEY_A
   and new_keys
   beq not_pressed_A
+  pressed_A:
 
-pressed_lmb:
-  ; So the player has pressed A.  Now is this the end of this script?
-  ; If the next byte of this script or the stacked script is nonzero,
-  ; the script is not at its end.
-  ldy #0
-  lda (script_ptr),y
-  bne script_not_done
-  lda stacked_script_ptr+1
-  beq script_is_done
-  lda (stacked_script_ptr),y
-  bne script_not_done
+    ; So the player has pressed A.  Now is this the end of this script?
+    ; If a script is stacked or the next byte is nonzero,
+    ; the script is not at its end.
+    ldy #0
+    lda (script_ptr),y
+    ora stacked_script_ptr+1
+    bne script_not_done
+      lda #FADEOUT_SPEED
+      sta cutFadeDir
+      rts
 
-script_not_done:
-  ; The script is not done; it needs the screen cleared
-  ; for the next paragraph.
-  lda #CUT_STATE_CLS
-  sta gameState
-  lda #$81
-  sta cutscene_vram_dst_lo
-not_pressed_A:
-  rts
-script_is_done:
-  lda #4
-  sta cutFadeDir
+    script_not_done:
+
+    ; The script is not done; it needs the screen cleared
+    ; for the next paragraph.
+    lda #CUT_STATE_CLS
+    sta gameState
+    lda #$81
+    sta cutscene_vram_dst_lo
+  not_pressed_A:
   rts
 .endproc
 
@@ -420,19 +428,19 @@ clrloop:
   adc #32
   sta cutscene_vram_dst_lo
   bcc notDoneYet
-  lda #CUT_STATE_NEW_GRAPH
-  sta gameState
-notDoneYet:
+    lda #CUT_STATE_NEW_GRAPH
+    sta gameState
+  notDoneYet:
   rts
 .endproc
 
 .proc cut_handle_state_new_graph
-  lda #$22
+  lda #>DIALOGUE_TOPLEFT
   sta PPUADDR
   sta cutscene_vram_dst_hi
-  lda #$81
+  lda #<DIALOGUE_TOPLEFT - 32 - 1
   sta PPUADDR
-  lda #$A2
+  lda #<DIALOGUE_TOPLEFT
   sta cutscene_vram_dst_lo
   lda #'<'
   sta PPUDATA
@@ -440,18 +448,19 @@ notDoneYet:
   
   ; Fetch the speaker
   lda (script_ptr),y
+  sta $4444
   inc script_ptr
   bne :+
-  inc script_ptr+1
-:
+    inc script_ptr+1
+  :
   jsr cut_translate_actorid
 
   ; Fetch the speaker's name
-  cmp #15
+  cmp #NUM_SPEAKERS
   bcc :+
-  lda #15
-  clc
-:
+    lda #NUM_SPEAKERS - 1
+    clc
+  :
   tax
   lda #<character_name0
   adc character_name_offset,x
@@ -485,9 +494,9 @@ nul:
   cmp #'X'-'A'
   bcc not_role
   sbc #'X'-'A'
-  tay
-  lda variable_actor_ids,y
-not_role:
+    tay
+    lda variable_actor_ids,y
+  not_role:
   rts
 .endproc
 
@@ -651,9 +660,9 @@ character_name_offset:
   .byt character_name11-character_name0
   .byt character_name12-character_name0
   .byt character_name13-character_name0
-  .byt character_name14-character_name0
+NUM_SPEAKERS = * - character_name_offset
 
-il = $AF
+il = $1F
 
 character_name0:  .byt "T",il,"da",0
 character_name1:  .byt "Meg",0
@@ -669,11 +678,9 @@ character_name10: .byt "Thad",0
 character_name11: .byt "Oliver",0
 character_name12: .byt "L.T.D.",0  ; Traveling musician
 character_name13: .byt "Pino",0    ; Voice on phone
-character_name14: .byt "???",0
 
 ; $00 for male, $80 for female
 character_sex: .byt $80,$80, $00, $80,$00,$00,$80,$80,$00, $80, $00,$00
 paranoid_characters:  .byt 0, 6, 8
 laidback_characters:  .byt 1, 5, 10
 detective_characters: .byt 3, 4, 7, 11
-
