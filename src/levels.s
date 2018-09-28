@@ -22,8 +22,6 @@
 
 .include "global.inc"
 
-.import levelTips
-
 .segment "RODATA"
 ; Seven parameters vary per round:  the speed of the missiles, the
 ; number of missiles before the round ends, the time between salvos
@@ -115,6 +113,18 @@ levelTable:
   .byt  39, 30, 20,%00000000, 9, 4, 5, 9
   .byt  40, 35, 20,%00000000, 9, 4, 5, 8
 
+; The tip that appears across the top of each screen for each level,
+; where numbers refer to indices in tips.txt.
+; Level $01's tip is replaced with tipTwoPlayer
+; inside loadLevel in levels.s
+levelTips:
+  .byt  5, 6, 7, 8, 9
+  .byt 12,10, 0, 0, 0
+  .byt  0, 0, 0, 0, 0
+  .byt 14, 0, 0, 0, 0
+  .byt  0, 0, 0, 0, 0
+  .byt  0, 0, 0, 0, 0
+  .byt  0, 0, 0, 0, 0
 
 .segment "BSS"
 ; Do not shuffle these; they must remain in the same order as in
@@ -125,62 +135,71 @@ levelReleasePeriod: .res 1
 levelFlags:         .res 1  ; not yet used
 levelSalvoSizes:    .res 4
 
+ONE_PLAYER_AMMO_TIP = 6
+TWO_PLAYER_AMMO_TIP = 11
+
 .segment "CODE"
 
 ;;
 ; Loads the data for a level
 ; @param A level number (0-63)
 .proc loadLevel
+lvlptr = $00
+  ; If not in practice, load the level tip
   tax
   lda isPractice
   bne noLoadTip
-  lda levelTips,x
-  sta curTip
-  cpx #1
-  bne notTwoPlayerReplace
-  lda numPlayers
-  cmp #2
-  bne notTwoPlayerReplace
-  lda #11  ; two player tip
-  sta curTip
-notTwoPlayerReplace:
-  lda #BG_DIRTY_TIP
-  ora bgDirty
-  sta bgDirty
-  lda #50
-  sta tipTimeLeft
-noLoadTip:
+    lda levelTips,x
+    sta curTip
+
+    cmp #ONE_PLAYER_AMMO_TIP
+    bne notTwoPlayerReplace
+    lda numPlayers
+    cmp #2
+    bne notTwoPlayerReplace
+      lda #TWO_PLAYER_AMMO_TIP
+      sta curTip
+    notTwoPlayerReplace:
+
+    lda #BG_DIRTY_TIP
+    ora bgDirty
+    sta bgDirty
+    lda #50
+    sta tipTimeLeft
+  noLoadTip:
+
+  ; Load other level parameters
   txa
   asl a
   asl a
   asl a
-  sta 0
+  sta lvlptr+0
   lda #0
   rol a
-  sta 1
+  sta lvlptr+1
   lda #<levelTable
-  adc 0
-  sta 0
+  adc lvlptr+0
+  sta lvlptr+0
   lda #>levelTable
-  adc 1
-  sta 1
+  adc lvlptr+1
+  sta lvlptr+1
   ldy #7
 copyloop:
-  lda (0),y
+  lda (lvlptr),y
   sta levelMissileSpeed,y
   dey
   bpl copyloop
 
-  ; Make missiles 18.75% faster on PAL (should be 20% but
-  ; who'll notice?)
+  ; Make missiles 18.75% faster on PAL (approximating 20%).
+  ; A still contains missile speed
   ldx tvSystem
   beq noPALCorrection
   lsr a
-  adc levelMissileSpeed
+  adc levelMissileSpeed  ; A = 1.5*speed
   lsr a
   lsr a
-  lsr a
-  adc levelMissileSpeed
+  lsr a                  ; A = 0.1875*speed
+  adc levelMissileSpeed  ; A = 1.1875*speed
   sta levelMissileSpeed
 noPALCorrection:
 

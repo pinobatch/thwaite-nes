@@ -12,9 +12,11 @@ def ca65_bytearray(s):
 def lines_to_docs(lines):
     cur_page = cur_title = None
     for line in lines:
-        # some styles have 
+        # some parsers need leading whitespace to be preserved
         line = line.rstrip()
         linestrip = line.lstrip()
+
+        # Page title syntax resembles a MediaWiki headline
         if linestrip.startswith("==") and linestrip.endswith("=="):
             # Strip trailing blank lines
             while cur_page and cur_page[-1] == '':
