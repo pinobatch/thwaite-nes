@@ -1,0 +1,60 @@
+== tipNone ==
+
+== tipGameOver ==
+         GAME OVER
+== tipNiceJob ==
+         Nice Job!
+Left:  *🏠  *🚀   Bonus:    00
+== tipRebuildSilo ==
+Repairs to the silo
+are complete.
+== tipRebuildHouse ==
+'s house has
+been rebuilt.
+== tipSun1 ==
+# The tip system is inspired by that of Klax.
+# Try to give tips on or before the wave where a tip is required,
+# preferably the wave before, and no later than the wave after the
+# first where it is useful.  But because we can't do that for SUN 01,
+# go very easy on the incoming ammo to make it beatable without B.
+Shoot down incoming missiles
+to defend the town!
+== tipBothSilos ==
+# In 2-player mode, tipTwoPlayer replaces this one
+Shoot from both silos:
+press B or A.
+== tipPathsCross ==
+# SUN 03 is the first with balloons.  Because we can't give both
+# the splitting tip and an ammo-saving tip, go very easy on the
+# frequency so that a few splits don't hurt too much.
+You can destroy two missiles
+by aiming where paths cross.
+== tipPayload ==
+Destroy balloons and MIRVs
+before they drop a payload.
+== tipRebuilt ==
+Survive until morning and
+a house will be rebuilt.
+== tipTopToBottom ==
+TIP: Start at the top
+and progress to the bottom.
+== tipTwoPlayer ==
+Each player's silo has
+its own stock of ABMs.
+== tipWreckage ==
+Don't worry about missiles
+that are aimed at wreckage.
+== tipNova ==
+illegal missile count
+you lil cheater
+== tipBalloonFever1 ==
+# Based on GLSEN's ThinkB4YouSpeak ad campaign circa 2008
+# Appears on a level with balloons, a callback to a 2005 incident
+# where DDREI.com used "balloon fever" as a censor for "gay"
+When you say "that's so gay",
+do you realize what you say?
+== levelTips ==
+tipSun1 tipBothSilos tipPathsCross tipPayload tipRebuilt
+tipWreckage tipTopToBottom - - -
+- - - - -
+tipBalloonFever1

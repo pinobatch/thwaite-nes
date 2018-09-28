@@ -1,0 +1,184 @@
+== perfect_sun_script ==
+# X, Y, and Z are paranoid, detective, and slacker personalities
+# This one is a reference to Zero Wing (for Mega Drive).
+<Z> OK, last night, what happen?
+<X> Somebody set up us the bomb.
+<Y> I only wish we get signal.
+<X> I'm just glad none of those
+missiles hit.
+
+== perfect_mon_script ==
+<Y> $C and $J are doing
+a great job.
+<X> They'd better.
+Because if one of those
+lands on my house...
+<Z> Then you can come live
+with me!
+
+== perfect_tue_script ==
+<Z> It's like we get a fireworks
+show every night!  We don't
+even have to wait for July.
+<X> Cool it, $Z.
+It's not fun and games.
+
+== perfect_wed_script ==
+<Z> Last night's show was even
+more impressive!
+<Y> You know what, $Z?
+I'm starting to think
+you're right.
+<Y> Because if it weren't just
+a show, something would
+have been blown up by now.
+<X> I don't know, but it makes
+me so nervous I can't sleep.
+
+== perfect_thu_script ==
+<Z> I think I'll go in and tell
+them what a great show!
+<Y> Don't bother; it's probably
+scripted.  A machine aims
+the shells on set paths.
+<Y> And even if they did hit the
+ground, which won't happen,
+<Y> I bet they wouldn't
+actually do anything.
+<X> Keep saying that and
+there'll certainly
+be a caTAStrophe.
+
+== perfect_fri_script ==
+<X> I still think the threat is
+real, but no one believes me.
+<X> Everyone else in town has
+bought into $Y's theory
+<X> that it's all a show and
+no one is in any danger.
+<Z> They're fan-TAS-tic!
+
+== perfect_sat_script ==
+<Z> Aww man, no more fireworks!
+<X> My life is a steaming pile
+of tech demo.
+<N> It's a secret to everybody.
+<N> Thank you for TASing Thwaite.
+Feel free to play again
+at full speed :P
+
+== perfect_next_week_script ==
+# TODO: Add a "SUN 01" level with no missiles for 60 seconds
+# as part of the ending
+# TODO: Write script for Saturday and move the perfect_sat_script
+# down here
+<N> Unused
+
+== enter_poor_1 ==
+# Displayed on 1st day after houses standing are less than 10.
+# When an enter_poor_* is displayed for the first time, the roles are
+# recast where the first villager whose house is destroyed becomes
+# the new paranoid.
+<X> My house!
+
+== enter_poor_2 ==
+# Displayed on 1st day after houses standing are less than 4
+<X> Our houses! Ruined!
+<Z> If we can just hold
+together, I know we can
+get through this.
+
+== discover_clue_1 ==
+<Y> I was looking in the
+wreckage of $X's house
+when I noticed something.
+<Y> Look at this.
+<Z> It's half melted.
+What's that supposed to be?
+<Y> I'm not sure.
+There's some writing on it,
+but I can't make it out.
+<X> Could be a guitar pick.
+Someone has a strange taste
+in shrapnel.
+
+== discover_clue_2 ==
+<Y> I found some wire in the
+ruins of your house, $X.
+<Y> It looks sort of like
+piano wire. Do you play
+an instrument?
+<X> No. Why do you ask?
+<Y> It might be from the missile
+that hit your house.
+<Z> I'd go look myself, but
+I keep thinking about my
+tummy.
+
+== discover_clue_3 ==
+<Y> I got back from the police
+station. I was looking at
+the evidence,
+<Y> and I'm not positive it's
+piano wire. It might be a
+guitar string.
+<X> Guitar pick? Guitar string?
+I bet $M is behind this!
+<X> I *knew* something was up
+with him last Saturday night.
+
+== discover_clue_4 ==
+<N> Unused
+
+== end_script ==
+<X> $M! My house! You...
+<M> OK, man, I confess.
+I did it.
+<X> Shame on you!
+You better never show your
+face in this town again.
+<Z> Chill, $X. Hear him out.
+<M> I don't know what came
+over me.
+<M> It all started after
+Videomation.
+<M> People drew things, but
+they couldn't save them.
+<M> Once Mario Paint came out,
+people could make drawings
+and music to last.
+<M> After that, creativity
+exploded.
+<Z> Exploded, yeah, like
+the O in the title.
+<M> There are things you don't
+know about me.
+<M> I've been playing with
+explosives for a long time.
+<M> They're like music: they can
+be used for good or bad.
+<Y> As Alfred Nobel found out
+soon after he invented
+dynamite.
+<M> Good things like blowing up
+the west and east cliffs
+for more living space.
+<M> And bad things like
+what I ended up doing.
+<M> I'm sorry, man.
+Let me make it up to you.
+<M> First I'll give the museum
+a full set of my bootlegs.
+<M> Then I'll help fix all
+your houses.
+<M> And about your wasted
+fireworks:
+I've got better ones.
+<X> I don't know...
+<Z> Come on, $X.
+
+== default_script ==
+<N> Move the crosshair with the
+Control Pad, and shoot a
+firework with B or A.
+<N> And watch your ammo!

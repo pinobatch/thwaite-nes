@@ -23,11 +23,10 @@
 .include "nes.inc"
 .include "global.inc"
 
-BG_GRASSNUM = $10
+BG_GRASSNUM = $C0
 TILE_BETWEEN_HOUSES = $8F
 BUILDING_WRECKAGE_TILE = $9E
 BG_USE_DEBUGHEX = 0
-
 BG_GRASSO = BG_GRASSNUM+0
 BG_GRASSA = BG_GRASSNUM+10
 BG_GRASSB = BG_GRASSNUM+11
@@ -44,7 +43,6 @@ BG_GRASST = $A5
 BG_GRASSU = $A6
 BG_GRASSW = $A7
 BG_GRASSCOLON = $A8
-; $A9 is the copyright symbol, for latin-1 consistency
 BG_GRASSI = $AA
 
 

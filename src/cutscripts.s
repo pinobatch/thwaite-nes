@@ -20,7 +20,7 @@
 ;
 ;   Visit http://www.pineight.com/ for more information.
 
-il = $AF
+il = $1F
 
 .export cut_scripts
 .segment "LIBDATA"

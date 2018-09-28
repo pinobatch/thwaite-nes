@@ -1,6 +1,6 @@
 Thwaite 0.04-wip
 
-© 2011 Damian YERRICK
+ 2011 Damian YERRICK
 <thwaite@pineight.com>
 
 Comes with ABSOLUTELY NO 
@@ -8,7 +8,7 @@ WARRANTY.  This is free
 software, and you are
 welcome to share it under
 certain conditions.
-For deta¯s, see LICENSE.txt
+For detas, see LICENSE.txt
 
 To do:
 * draw big versions of town
@@ -16,7 +16,7 @@ To do:
 * animate the cut scenes
 * attract mode
 * move library above $C000
-* track miss¯es' spawn IDs
-  for double-k¯l tracking
+* track misses' spawn IDs
+  for double-kl tracking
 
      Press Start Button

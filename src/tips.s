@@ -22,8 +22,10 @@
 
 .export levelTips, tipTexts
 
-MISSILE_SYMBOL_TILE = $AC
-HOUSE_SYMBOL_TILE = $7F
+MISSILE_GLYPH = $1D
+il = $1F
+HOUSE_GLYPH = $7F
+
 .segment "RODATA"
 tipNova:
   .byt "",il,"legal miss",il,"e count",10,"you l",il," cheater",0
@@ -43,8 +45,6 @@ tipTexts:
   .addr tipNone, tipGameOver, tipNiceJob, tipRebuildSilo, tipRebuildHouse
   .addr tipSun1, tipBothSilos, tipPathsCross, tipPayload, tipRebuilt
   .addr tipTopToBottom, tipTwoPlayer, tipWreckage, tipNova, tipBalloonFever1
-  
-il = $AF
 
 ;length"There is a limit of 28      ",10,"characters per line.        ",0
 tipGameOver:
@@ -53,7 +53,7 @@ tipNone:
   .byt 0
 tipNiceJob:
   .byt "         Nice Job!",          10
-  .byt "Left:  *",HOUSE_SYMBOL_TILE,"  *",MISSILE_SYMBOL_TILE,"   Bonus:    00",0
+  .byt "Left:  *",HOUSE_GLYPH,"  *",MISSILE_GLYPH,"   Bonus:    00",0
 tipRebuildSilo:
   .byt "Repairs to the s",il,"o",          10,"are complete.",0
 tipRebuildHouse:
