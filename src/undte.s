@@ -7,8 +7,6 @@
 ; pairs of code units.  The second is added to a stack, and the
 ; first is interpreted as above.
 
-DTE_MIN_CODEUNIT = 128
-
 .code
 .proc undte_line
 srcaddr = $00

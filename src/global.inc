@@ -183,3 +183,13 @@ abl_keys = 6
 .globalzp isPractice, practiceSide
 ; practice methods
 .global practice_menu
+
+; dte constants
+DTE_OUTPUT_LEN = 32
+DTE_MIN_CODEUNIT = $80
+FIRST_PRINTABLE_CU = $1C
+DTE_REPLACEMENTS = $BFE0  ; temporary to get undte assembling
+; dte fields
+dte_output_buf = $0180  ; temporary to get undte assembling
+; dte methods
+.global undte_line

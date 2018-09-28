@@ -7,7 +7,7 @@ vector: .res 2
 sp_save: .res 1
 popslide_used: .res 1
 
-.code
+.segment "LIBCODE"
 .align 256
 popslide_nonrun_base:
   .repeat 16

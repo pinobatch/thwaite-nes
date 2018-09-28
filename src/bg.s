@@ -606,6 +606,7 @@ copynamedone:
   rts
 .endproc
 
+.if BG_USE_DEBUGHEX
 .proc puthex
   pha
   lsr a
@@ -620,6 +621,7 @@ copynamedone:
   sta PPUDATA
   rts  
 .endproc
+.endif
 
 .proc newGame
   lda #BUILDING_OK
