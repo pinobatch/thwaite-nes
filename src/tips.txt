@@ -53,8 +53,3 @@ you lil cheater
 # where DDREI.com used "balloon fever" as a censor for "gay"
 When you say "that's so gay",
 do you realize what you say?
-== levelTips ==
-tipSun1 tipBothSilos tipPathsCross tipPayload tipRebuilt
-tipWreckage tipTopToBottom - - -
-- - - - -
-tipBalloonFever1

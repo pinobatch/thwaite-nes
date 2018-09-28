@@ -95,6 +95,13 @@ $(objdir)/practice.o: src/practice.txt
 $(objdir)/ntscPeriods.s: tools/mktables.py
 	$(PY) $< period $@
 
+$(objdir)/cutscripts.s: \
+  tools/paginate.py $(srcdir)/cutscripts.txt $(srcdir)/tips.txt
+	$(PY) tools/paginate.py \
+	-t cutscripts $(srcdir)/cutscripts.txt \
+	-t tips $(srcdir)/tips.txt \
+	-o $@
+
 map.txt $(title).prg: nrom256.x $(objlistntsc)
 	$(LD65) -o $(title).prg -m map.txt -C $^
 
