@@ -429,27 +429,28 @@ no_show_marker:
 .endproc
 
 .proc cut_handle_state_cls
+  ldy #4
   ldx popslide_used
-  txa
-  clc
-  adc #4
-  sta popslide_used
-  lda #29|$40
-  sta popslide_buf+2,x
-  lda #' '
-  sta popslide_buf+3,x
-  lda #>DIALOGUE_TOPLEFT
-  sta popslide_buf+0,x
-  lda cutscene_vram_dst_lo
-  sta popslide_buf+1,x
-  clc
-  adc #32
-  sta cutscene_vram_dst_lo
-  bcc notDoneYet
-    lda #CUT_STATE_NEW_GRAPH
-    sta gameState
-  notDoneYet:
-  rts
+  rowloop:
+    lda #>DIALOGUE_TOPLEFT
+    sta popslide_buf+0,x
+    lda cutscene_vram_dst_lo
+    sta popslide_buf+1,x
+    clc
+    adc #32
+    sta cutscene_vram_dst_lo
+    lda #29|$40
+    sta popslide_buf+2,x
+    lda #' '
+    sta popslide_buf+3,x
+    inx
+    inx
+    inx
+    inx
+    dey
+    bne rowloop
+  stx popslide_used
+  ; and fall through to
 .endproc
 
 .proc cut_handle_state_new_graph
