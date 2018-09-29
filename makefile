@@ -54,16 +54,21 @@ run: $(title).nes
 	$(EMU) $<
 debug: $(title).nes
 	$(DEBUGEMU) $<
+all: $(title).nes $(title)128.nes
+dist: zip
+zip: $(title)-$(version).zip
+clean:
+	-rm $(objdir)/*.o $(objdir)/*.s $(objdir)/*.chr
+	-rm map128.txt map.txt
 
-all: $(title).nes
+# packaging
 
 # Actually this depends on every single file in zip.in, but currently
 # we use changes to thwaite.nes, makefile, and README as a heuristic
 # for when something was changed.  Limitation: it won't see changes
 # to docs or tools.
-dist: zip
-zip: $(title)-$(version).zip
-$(title)-$(version).zip: zip.in $(title).nes README.html $(objdir)/index.txt
+$(title)-$(version).zip: \
+  zip.in $(title).nes $(title)128.nes README.html $(objdir)/index.txt
 	zip -9 -u $@ -@ < $<
 
 # Build zip.in from the list of files in the Git tree
@@ -75,9 +80,13 @@ zip.in:
 $(objdir)/index.txt: makefile CHANGES.txt
 	echo "Files produced by build tools go here." > $@
 
-clean:
-	-rm $(objdir)/*.o $(objdir)/*.s $(objdir)/*.chr
-	-rm $(title).chr $(title).prg
+# forming the ROM
+
+map.txt $(title).nes: nrom256.x $(objdir)/nrom256.o $(objlistntsc)
+	$(LD65) -o $(title).nes -m map.txt -C $^
+
+map128.txt $(title)128.nes: nrom128.x $(objdir)/nrom128.o $(objlistntsc)
+	$(LD65) -o $(title)128.nes -m map128.txt -C $^
 
 # assembly language
 
@@ -94,8 +103,8 @@ $(objdir)/popslide.o: $(srcdir)/popslideinternal.inc
 
 # incbins
 
-$(objdir)/title.o: src/title.pkb
 $(objdir)/cutscene.o: src/cutscene.pkb
+$(objdir)/main.o: $(objdir)/maingfx.chr $(objdir)/cuthouses.chr
 
 # data conversion
 
@@ -115,17 +124,7 @@ $(objdir)/dtescripts.s: tools/paginate.py \
 	-t text $(srcdir)/texts.txt \
 	-o $@
 
-map.txt $(title).prg: nrom256.x $(objlistntsc)
-	$(LD65) -o $(title).prg -m map.txt -C $^
-
 # graphics
 
 $(objdir)/%.chr: $(imgdir)/%.png
 	$(PY) tools/pilbmp2nes.py $< $@
-
-%.nes: %.prg %.chr
-	cat $^ > $@
-
-$(title).chr: $(objdir)/maingfx.chr $(objdir)/cuthouses.chr
-	cat $^ > $@
-

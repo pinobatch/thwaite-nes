@@ -1,7 +1,7 @@
 ; main.s
 ; Main program for Thwaite
 
-;;; Copyright (C) 2011 Damian Yerrick
+;;; Copyright (C) 2011,2018 Damian Yerrick
 ;
 ;   This program is free software; you can redistribute it and/or
 ;   modify it under the terms of the GNU General Public License
@@ -19,13 +19,6 @@
 ;     Boston, MA  02111-1307, USA.
 ;
 ;   Visit http://www.pineight.com/ for more information.
-
-.segment "INESHDR"
-  .byt "NES",$1A
-  .byt 2  ; 32 KiB PRG ROM as of Thwaite 0.04
-  .byt 1  ; 8 KiB CHR ROM
-  .byt 1  ; vertical mirroring; low mapper nibble: 0
-  .byt 0  ; high mapper nibble: 0; no NES 2.0 features used
 
 .include "nes.inc"
 .include "global.inc"
@@ -741,4 +734,6 @@ tipAlreadySet:
   rts
 .endproc
 
-
+.segment "CHR"
+.incbin "obj/nes/maingfx.chr"
+.incbin "obj/nes/cuthouses.chr"

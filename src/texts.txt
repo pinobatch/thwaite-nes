@@ -28,12 +28,11 @@ certain conditions.
 For details, see LICENSE.txt
 
 To do:
-* draw big versions of town
-  hall and police station
 * animate the cut scenes
 * attract mode
-* move library above $C000
 * track missiles' spawn IDs
   for double-kill tracking
+* github.com/pinobatch
+  /thwaite.nes/issues
 
      Press Start Button
