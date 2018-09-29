@@ -20,6 +20,7 @@
 ; @param A tile number
 ; @param X base address of nametable ($20, $24, $28, or $2C)
 ; @param Y attribute value ($00, $55, $AA, or $FF)
+; @return AY unchanged; X=0
 .proc ppu_clear_nt
 
   ; Set base PPU address to XX00

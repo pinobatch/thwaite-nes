@@ -147,6 +147,8 @@ done:
 .proc titleScreen
   jsr display_todo
   lda #VBLANK_NMI
+  sta crosshairYHi+0
+  sta crosshairXHi+0
   ldx #$00
   ldy #$3F
   sta PPUCTRL
@@ -155,33 +157,59 @@ done:
   stx PPUADDR
   lda #1
   sta numPlayers
-  lda #128
-  sta crosshairYHi+0
-  sta crosshairXHi+0
 copypal:
   lda title_palette,x
   sta PPUDATA
   inx
   cpx #32
   bcc copypal
-  
-  lda #<title_pkb
-  sta 0
-  lda #>title_pkb
-  sta 1
-  ldx #$20
-  stx PPUADDR
-  ldy #$00
-  sty PPUADDR
-  jsr PKB_unpackblk
-  
-  lda #$F0
+
   ldx #$04
-:
-  sta OAM,x
-  inx
-  bne :-
-  
+  jsr ppu_clear_oam
+  txa
+  tay
+  ldx #$20
+  jsr ppu_clear_nt
+
+  ; Most of the title screen is increasing horizontal runs
+  ; Y is still 0
+  incstriploop:
+    lda titlestrips,y
+    iny
+    sta PPUADDR
+    lda titlestrips,y
+    iny
+    sta PPUADDR
+    ldx titlestrips,y
+    iny
+    lda titlestrips,y
+    iny
+    clc
+    striptileloop:
+      sta PPUDATA
+      adc #1
+      dex
+      bne striptileloop
+    cpy #titlestripsend-titlestrips
+    bcc incstriploop
+
+  lda #VBLANK_NMI|VRAM_DOWN
+  sta PPUCTRL
+  lda #$22
+  sta PPUADDR
+  lda #$4B
+  sta PPUADDR
+  lda #$60
+  ldy #3
+  sec
+  playercountloop:
+    sta PPUDATA
+    ora #$10
+    sta PPUDATA
+    sbc #$0F
+    dey
+    bne playercountloop
+
 loop:
   jsr title_draw_sprites
   lda nmis
@@ -541,5 +569,24 @@ title_palette:
 mouse_icon_x:
   .byt 92, 140
 
-title_pkb:
-  .incbin "src/title.pkb"
+titlestrips:
+  ; Tops of "t" and "h"
+  .dbyt $2128,$01F1
+  .dbyt $212A,$01F2
+  .dbyt $2133,$01F1
+  ; "t"
+  .dbyt $2148,$02DC
+  .dbyt $2168,$02EC
+  .dbyt $2188,$02FC
+  ; "hwaite"
+  .dbyt $214A,$0DD3
+  .dbyt $216A,$0DE3
+  .dbyt $218A,$0DF3
+  ; "Player", "Players", "ractice"
+  .dbyt $224D,$0562
+  .dbyt $226D,$0572
+  .dbyt $228D,$0662
+  .dbyt $22AD,$0672
+  .dbyt $22CC,$066A
+  .dbyt $22EC,$067A
+titlestripsend:
