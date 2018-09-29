@@ -8,7 +8,7 @@
 ; pairs of code units.  The second is added to a stack, and the
 ; first is interpreted as above.
 
-.code
+.segment "LIBCODE"
 .proc undte_line
 srcaddr = $00
   sty srcaddr

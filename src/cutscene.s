@@ -27,7 +27,8 @@
 
 .segment "ZEROPAGE"
 script_ptr: .res 2
-stacked_script_ptr: .res 2
+name_interp_pos: .res 1
+decomp_buf_pos: .res 1
 cutscene_vram_dst_lo: .res 1
 cutscene_vram_dst_hi: .res 1
 ; cutStateTimer = tipTimeLeft
@@ -74,7 +75,6 @@ cutscene_actors: .res 4
   ldy #$20
   sty PPUADDR
   sta PPUADDR
-  sta stacked_script_ptr+1
   lda #<cutscene_pkb
   sta 0
   lda #>cutscene_pkb
@@ -296,37 +296,35 @@ handlers:
 .endproc
 
 .proc cut_handle_state_script
-  ldy #0
-retry_y0:
-  lda (script_ptr),y
+  ; is a name (e.g. $X) being interpolated?
+  ldy name_interp_pos
+  cpy #$FF
+  beq no_name_interp
+    inc name_interp_pos
+    lda character_name0,y
+    bne have_codeunit
+    lda #$FF
+    sta name_interp_pos
+  no_name_interp:
+  ldy decomp_buf_pos
+  inc decomp_buf_pos
+
+  ; NUL: Stop the script, then wait for pressing A
+  lda dte_output_buf,y
   bne not_nul
-
-    ; The script stack (used for $ interpolation) is one level deep.
-    ; If there's no stacked script, null means end of cut scene,
-    ; so go to the wait for A press.  Otherwise we're at the end of
-    ; a character name, so resume the script.
-    lda stacked_script_ptr+1
-    beq goto_A_press
     sta script_ptr+1
-    lda stacked_script_ptr
-    sta script_ptr
-    ; Y is still 0
-    sty stacked_script_ptr+1
-    beq retry_y0
-  not_nul:
-
-  inc script_ptr
-  bne :+
-    inc script_ptr+1
-  :
-  cmp #12
-  bne not_formfeed
   goto_A_press:
     lda #CUT_STATE_WAIT_A
     sta gameState
     rts
-  not_formfeed:
+  not_nul:
 
+  ; Form feed: Wait for pressing A
+  cmp #12
+  beq goto_A_press
+
+  ; Newline: Move cursor to next line and decompress another
+  ; line of text
   cmp #10
   bne not_newline
     lda cutscene_vram_dst_lo
@@ -337,13 +335,14 @@ retry_y0:
     bcc :+
       inc cutscene_vram_dst_hi
     :
-    rts
+    jmp cut_load_line
   not_newline:
 
+  ; Anything but dollar: Write a single code unit
   cmp #'$'
   beq is_dollar
 
-    ; Not dollar means it's a single character to write
+  have_codeunit:
     ldx popslide_used
     sta popslide_buf+3,x
     lda cutscene_vram_dst_hi
@@ -360,30 +359,15 @@ retry_y0:
     rts
   is_dollar:
 
-  ; Stack this script and load a character name
-  lda (script_ptr),y
-  pha
-
-  ; Stack 1 byte ahead
-  tya  ; Y still 0
-  sec
-  adc script_ptr
-  sta stacked_script_ptr
-  tya
-  adc script_ptr+1
-  sta stacked_script_ptr+1
-
-  ; Load the character's name
-  pla
+  ; load a character name
+  iny
+  lda dte_output_buf,y
+  inc decomp_buf_pos
   jsr cut_translate_actorid
   clc
   tax
-  lda #<character_name0
-  adc character_name_offset,x
-  sta script_ptr
-  lda #>character_name0
-  adc #0
-  sta script_ptr+1
+  lda character_name_offset,x
+  sta name_interp_pos
   jmp cut_handle_state_script
 .endproc
 
@@ -405,30 +389,25 @@ no_show_marker:
   beq not_pressed_A
   pressed_A:
 
-    ; So the player has pressed A.  Now is this the end of this script?
-    ; If a script is stacked or the next byte is nonzero,
-    ; the script is not at its end.
-    ldy #0
-    lda (script_ptr),y
-    ora stacked_script_ptr+1
+    ; If the script has ended (high byte 0), go to fadeout
+    lda script_ptr+1
     bne script_not_done
       lda #FADEOUT_SPEED
       sta cutFadeDir
       rts
-
     script_not_done:
 
     ; The script is not done; it needs the screen cleared
     ; for the next paragraph.
-    lda #CUT_STATE_CLS
-    sta gameState
     lda #$81
     sta cutscene_vram_dst_lo
+    jmp cut_handle_state_cls
   not_pressed_A:
   rts
 .endproc
 
 .proc cut_handle_state_cls
+  ; Add 4 Popslide packets, one to clear each line of text
   ldy #4
   ldx popslide_used
   rowloop:
@@ -520,6 +499,26 @@ src = 0
 
   lda #CUT_STATE_SCRIPT
   sta gameState
+  ; and fall through to
+.endproc
+
+;;
+; Decompresses 1 line of text
+.proc cut_load_line
+  lda script_ptr
+  sta $00
+  lda script_ptr+1
+  sta $01
+  jsr undte_line0
+  clc
+  adc $00
+  sta script_ptr
+  lda #0
+  sta decomp_buf_pos
+  adc $01
+  sta script_ptr+1
+  lda #$FF
+  sta name_interp_pos
   rts
 .endproc
 

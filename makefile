@@ -12,7 +12,7 @@ title = thwaite
 version = 0.04wip
 objlist = popslide16 \
           main random levels smoke bg missiles explosion scurry \
-          title practice cutscene cutscripts dtescripts \
+          title practice cutscene dtescripts \
           math bcd kinematics unpkb undte pads mouse ppuclear \
           paldetect pentlysound pentlymusic musicseq ntscPeriods
 
@@ -103,15 +103,15 @@ $(objdir)/ntscPeriods.s: tools/mktables.py
 	$(PY) $< period $@
 
 $(objdir)/cutscripts.s: tools/paginate.py \
-  $(srcdir)/cutscripts.txt $(srcdir)/tips.txt
+  $(srcdir)/cutscripts.txt
 	$(PY) tools/paginate.py \
-	-t cutscripts $(srcdir)/cutscripts.txt \
-	-t tips $(srcdir)/tips.txt \
 	-o $@
 
 $(objdir)/dtescripts.s: tools/paginate.py \
-  $(srcdir)/texts.txt
+  $(srcdir)/texts.txt $(srcdir)/tips.txt
 	$(PY) tools/paginate.py --dte \
+	-t cutscripts $(srcdir)/cutscripts.txt \
+	-t tips $(srcdir)/tips.txt \
 	-t text $(srcdir)/texts.txt \
 	-o $@
 

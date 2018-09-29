@@ -23,12 +23,12 @@ SEGMENTS {
   INESHDR:    load = HEADER, type = ro, align = $10;
   ZEROPAGE:   load = ZP, type = zp;
   BSS:        load = RAM, type = bss, define = yes, align = $100;
-  CODE:       load = ROM0, type = ro, align = $10;
-  RODATA:     load = ROM0, type = ro, align = $10;
   LIBCODE:    load = ROM7, type = ro, align = $100, optional=1;
   LIBDATA:    load = ROM7, type = ro, align = $10, optional=1;
   PENTLYCODE: load = ROM7, type = ro, optional=1;
   PENTLYDATA: load = ROM7, type = ro, optional=1;
+  CODE:       load = ROM0, type = ro, align = $10;
+  RODATA:     load = ROM0, type = ro, align = $10;
   VECTORS:    load = ROM7, type = ro, start = $FFFA;
 }
 

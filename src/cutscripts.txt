@@ -178,6 +178,9 @@ I've got better ones.
 <Z> Come on, $X.
 
 == default_script ==
+##<N> New game starts with
+##characters $X, $Y,
+##and $Z.
 <N> Move the crosshair with the
 Control Pad, and shoot a
 firework with B or A.
