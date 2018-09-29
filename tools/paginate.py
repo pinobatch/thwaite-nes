@@ -2,7 +2,10 @@
 import sys
 import os
 import charset
+import dte
 charset.register()  # as "thwaite"
+
+DTE_MIN_CODEUNIT = 128
 
 def ca65_bytearray(s):
     s = ['  .byte ' + ','.join("%3d" % ch for ch in s[i:i + 16])
@@ -130,7 +133,7 @@ def output_text(titles, lines_to_compress):
 
 def output_tips(titles, lines_to_compress):
     out = [
-        """;Thwaite text table generated with paginate.py
+        """;Thwaite tips generated with paginate.py
 .segment "RODATA"
 .export tipTexts
 .exportzp NUM_TIP_TEXTS:=%d
@@ -262,14 +265,17 @@ options:
 """
 
 def parse_argv(argv):
-    parsetype, outfile, jobs = "text", None, []
-    for n, v in read_getopt(argv[1:], "h?t:o:", ["type=", "output="]):
+    parsetype, outfile, jobs, use_dte = "text", None, [], False
+    longopts = ["type=", "output=", "dte"]
+    for n, v in read_getopt(argv[1:], "h?t:o:", longopts):
         if n in ("-h", "--help", "-?"):
             progname = os.path.basename(argv[0])
             print(helpText.replace("%prog", progname))
             sys.exit(0)
         if n in ("-t", "--type"):
             parsetype = v
+        elif n == '--dte':
+            use_dte = True
         elif n in ("-o", "--output"):
             if outfile is not None:
                 raise ValueError("output to %s but already set to %s"
@@ -279,12 +285,12 @@ def parse_argv(argv):
             jobs.append((v, output_funcs[parsetype]))
     if outfile is None:
         outfile = '-'
-    return outfile, jobs
+    return outfile, jobs, use_dte
 
 def main(argv=None):
     argv = argv or sys.argv
     try:
-        outfile, jobs = parse_argv(argv)
+        outfile, jobs, use_dte = parse_argv(argv)
     except Exception as e:
         progname = os.path.basename(argv[0])
         print("%s: %s; try %s --help"
@@ -302,10 +308,23 @@ def main(argv=None):
         all_lines.extend(ltc)
 
     # TODO: compress all_lines
+    all_out = []
+    if use_dte:
+        bytesbefore = sum(len(x) for x in all_lines)
+        all_lines, repls, _ = dte.dte_compress(all_lines, mincodeunit=DTE_MIN_CODEUNIT)
+        bytesafter = sum(len(x) for x in all_lines)
+        print("compressed %d bytes to %d bytes"
+              % (bytesbefore, bytesafter+256), file=sys.stderr)
+        all_out.append("""; Digram tree compression dictionary
+.segment "RODATA"
+.export dte_replacements
+dte_replacements:
+""")
+        all_out.append(ca65_bytearray(b"".join(repls)))
+        all_out.append("\n")
 
     # Write compressed data for all jobs
     startline = 0
-    all_out = []
     for outfunc, parsed, nlines in all_parsed:
         endline = startline + nlines
         ltc = all_lines[startline:endline]
@@ -323,7 +342,11 @@ if __name__=='__main__':
     in_IDLE = 'idlelib.__main__' in sys.modules or 'idlelib.run' in sys.modules
     if in_IDLE:
         cmd = """
-paginate.py -t cutscripts ../src/cutscripts.txt
+paginate.py
+-t cutscripts ../src/cutscripts.txt
+-t text ../src/texts.txt
+-t tips ../src/tips.txt
+--dte
 """
         main(cmd.split())
     else:

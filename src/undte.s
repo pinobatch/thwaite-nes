@@ -1,4 +1,5 @@
 .include "global.inc"
+.import dte_replacements
 
 ; BPE (Byte Pair Encoding) or DTE (Digram Tree Encoding)
 ; Code units less then DTE_MIN_CODEUNIT map to literal characters.
@@ -15,14 +16,14 @@ srcaddr = $00
 .endproc
 .proc undte_line0
 srcaddr = $00
-ysave = $02
-repltable = $03
+repltable = $02
+ysave = $04
 
   ; Copy the compressed data to the END of dte_output_buf.
   ; First calculate compressed data length
-  lda DTE_REPLACEMENTS + 0
+  lda #<dte_replacements
   sta repltable + 0
-  lda DTE_REPLACEMENTS + 1
+  lda #>dte_replacements
   sta repltable + 1
   ldy #0
 strlenloop:

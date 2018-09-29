@@ -33,49 +33,47 @@ B_TO_RESET = 0
 ; Displays the text file pointed to at (0)
 ; starting at (2, 3) on nametable $2000.
 .proc display_textfile
-src = 0
-dstLo = 2
-dstHi = 3
+src   = $00
+dstLo = $05
+dstHi = $06
   lda #$20
   sta dstHi
   lda #$62
   sta dstLo
-txt_rowloop:
-  ldy dstHi
-  sty PPUADDR
-  ldy dstLo
-  sty PPUADDR
-  ldy #0
-txt_charloop:
-  lda (src),y
-  beq txt_done
-  cmp #$0A
-  beq is_newline
-  sta PPUDATA
-  iny
-  bne txt_charloop
-is_newline:
-
-  sec
-  tya
-  adc src+0
-  sta src+0
-  lda src+1
-  adc #0
-  sta src+1
-  lda dstLo
-  adc #32
-  sta dstLo
-  lda dstHi
-  adc #0
-  sta dstHi
-  cmp #$23
-  bcc txt_rowloop
-  lda dstLo
-  cmp #$C0
-  bcc txt_rowloop
-
-txt_done:
+  txt_rowloop:
+    jsr undte_line0
+    clc
+    adc src+0
+    sta src+0
+    bcc :+
+      inc src+1
+    :
+    lda dstHi
+    sta PPUADDR
+    lda dstLo
+    sta PPUADDR
+    clc
+    adc #32
+    sta dstLo
+    bcc :+
+      inc dstHi
+    :
+    ldx #0
+    txt_charloop:
+      lda dte_output_buf,x
+      beq txt_done
+      cmp #$0A
+      beq is_newline
+      sta PPUDATA
+      inx
+      bne txt_charloop
+    is_newline:
+    lda dstLo
+    cmp #$C0
+    lda dstHi
+    sbc #$23
+    bcc txt_rowloop
+  txt_done:
   rts
 .endproc
 

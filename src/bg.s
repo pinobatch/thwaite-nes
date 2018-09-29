@@ -454,12 +454,17 @@ noSpeedTens:
 ; If tipTimeLeft is nonzero, draws tip number curTip. Otherwise,
 ; erases the tip.
 .proc buildTipBar
-tipSrc = 14
+tipSrc = $00
+tipDst = $05
 
   jsr clearTipBar
   ldx #2
   ; If we're suffixing a tip onto a name, we enter here.
 suffix:
+
+  ; 2018-09: When is this taken, exactly?
+  lda tipTimeLeft
+  beq doneLoadingTip
 
   lda curTip
   asl a
@@ -468,25 +473,31 @@ suffix:
   sta tipSrc
   lda tipTexts+1,y
   sta tipSrc+1
+  tiplineloop:
+    stx tipDst
+    jsr undte_line0
+    clc
+    adc tipSrc+0
+    sta tipSrc+0
+    bcc :+
+      inc tipSrc+1
+    :
+    ldx tipDst
+    ldy #0
+    tipchrloop:
+      lda dte_output_buf,y
+      beq doneLoadingTip
+      cmp #$0A
+      beq isNewline
+      sta houseXferBuf,x
+      inx
+      iny
+      bne tipchrloop
+    isNewline:
+    ldx #34
+    bne tiplineloop
+  doneLoadingTip:
 
-  ; load the current gameplay tip
-  lda tipTimeLeft
-  beq doneLoadingTip
-  ldy #0
-loadTipLoop:
-  lda (tipSrc),y
-  beq doneLoadingTip
-  cmp #10
-  bne notNewline
-  ldx #34
-  bne tipContinue
-notNewline:
-  sta houseXferBuf,x
-  inx
-tipContinue:
-  iny
-  bne loadTipLoop
-doneLoadingTip:
   rts
 .endproc
 
