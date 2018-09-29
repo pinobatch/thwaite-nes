@@ -31,6 +31,7 @@ name_interp_pos: .res 1
 decomp_buf_pos: .res 1
 cutscene_vram_dst_lo: .res 1
 cutscene_vram_dst_hi: .res 1
+cutscene_x_scroll: .res 1
 ; cutStateTimer = tipTimeLeft
 
 CUT_STATE_SCRIPT = 0
@@ -63,7 +64,8 @@ cutscene_actors: .res 4
   sta cutFadeDir
   lda #FADEIN_START
   sta cutFadeAmount
-  jsr popslide_init
+  lda #114
+  sta cutscene_x_scroll
 
   ; turn off rendering
   lda #VBLANK_NMI
@@ -71,54 +73,11 @@ cutscene_actors: .res 4
   asl a
   sta PPUMASK
 
-  ; load the background image
-  ldy #$20
-  sty PPUADDR
-  sta PPUADDR
-  lda #<cutscene_pkb
-  sta 0
-  lda #>cutscene_pkb
-  sta 1
-  jsr PKB_unpackblk
-  
-  ; now hide the houses that have been blown up
-  ldy #5
-  ; this part uses vertical nametable writes
-  lda #VBLANK_NMI|VRAM_DOWN
-  sta PPUCTRL
-  blown_up_mod:
-    lda housesStanding+3,y
-    bne this_one_not_blown_up
-      sty 0
-      tya
-      asl a
-      asl a
-      ora #<HOUSES_TOPLEFT
-      adc 0
-      sta 0
-      ldx #3
-      hideHouseLoop:
-        lda #>HOUSES_TOPLEFT
-        sta PPUADDR
-        lda 0
-        inc 0
-        sta PPUADDR
-        lda #$00
-        sta PPUDATA
-        sta PPUDATA
-        txa
-        eor #$BB
-        sta PPUDATA
-        eor #$04
-        sta PPUDATA
-      dex
-      bpl hideHouseLoop
-    this_one_not_blown_up:
-    dey
-    bpl blown_up_mod
-
-  lda #VBLANK_NMI
-  sta PPUCTRL
+  jsr popslide_init
+  jsr cut_draw_skyground
+  jsr cut_draw_dialogue_frame
+  jsr popslide_terminate_blit
+  jsr cut_draw_buildings
 
   ; load the sprite table (trees and the like)
   ldx #cutscene_init_oam_end - cutscene_init_oam - 1
@@ -131,6 +90,246 @@ oamcopyloop:
   sta OAM+0
   ldx #cutscene_init_oam_end - cutscene_init_oam
   jmp ppu_clear_oam
+.endproc
+
+SKY_TILE = $00
+FLOOR_TILE = $C7
+GRASS_TILE = $04
+; rows 5-14: sky
+; row 15: floor
+; rows 16-17: grass
+.proc cut_draw_skyground
+  lda #$03
+  ldy #$00
+  ldx #$20
+  jsr ppu_clear_nt
+  ldx #$24
+  jsr ppu_clear_nt
+  ldx #$20
+  jsr oneside
+  ldx #$24
+
+oneside:
+  ; $23D8 and $27D8: attributes for houses
+  txa
+  ora #$03
+  sta PPUADDR
+  lda #$D8
+  sta PPUADDR
+
+  ; First NT: FF55AAFFFF55AAFF
+  ; Second NT: 55AAFF5555AAFF55
+  txa  ; $FF first NT, $55 second NT
+  and #$04
+  beq :+
+    lda #$AA
+  :
+  eor #$FF
+  jsr halfattr
+  jsr halfattr
+
+  ; Now that attributes are done, write the tilemap proper.
+  ; Top letterbox
+  stx PPUADDR
+  ; ldy #0
+  sty PPUADDR
+  lda #1
+  ldy #32*5/2
+  jsr wr_2y_bytes
+
+  ; Sky
+  ldy #32*10/2
+  lda #SKY_TILE
+  jsr wr_2y_bytes
+  ; Ground
+  ldy #32/2
+  lda #FLOOR_TILE
+  jsr wr_2y_bytes
+  ; Grass
+  lda #GRASS_TILE
+  jsr onegrass
+  lda #GRASS_TILE+2
+onegrass:
+  ldy #32
+  clc
+  grassloop:
+    sta PPUDATA
+    adc #1
+    and #$03
+    ora #GRASS_TILE
+    dey
+    bne grassloop
+  rts
+
+halfattr:
+  sta PPUDATA
+  ldy #3
+  attrcell:
+    clc
+    adc #$55
+    bcc :+
+      lda #$55
+    :
+    sta PPUDATA
+    dey
+    bne attrcell
+  rts
+
+wr_2y_bytes:
+  sta PPUDATA
+  sta PPUDATA
+  dey
+  bne wr_2y_bytes
+  rts
+.endproc
+
+.proc cut_draw_buildings
+housesrc = $00
+bldg_id = $02
+opaquebits = $03
+
+  ldx #NUM_BUILDINGS-1
+bldgloop:
+  stx bldg_id
+
+  ; Find building top left corner
+  ; $2180-$219E for houses with X=0-15
+  ; $2580-$259E for houses with X=0-15
+  lda houseX,x
+  and #$10
+  lsr a
+  lsr a
+  ora #$21
+  sta cutscene_vram_dst_hi
+  lda houseX,x
+  and #$0F
+  asl a
+  ora #$80
+  sta cutscene_vram_dst_lo
+
+  ; Find building tile definition
+  lda housesStanding,x
+  cmp #1
+  lda houseShape,x
+  bcs :+
+    lda #$8C
+  :
+  asl a
+  asl a  ; 0, 8, 16, ..., 48
+  adc #<houseShapeBig
+  sta housesrc+0
+  lda #0
+  adc #>houseShapeBig
+  sta housesrc+1
+
+  ldy #0
+  rowloop:
+    lda cutscene_vram_dst_hi
+    sta PPUADDR
+    lda cutscene_vram_dst_lo
+    sta PPUADDR
+    clc
+    adc #32
+    sta cutscene_vram_dst_lo
+    lda (housesrc),y
+    iny
+    sta opaquebits
+    lda (housesrc),y
+    iny
+    ldx #4
+    tileloop:
+      asl opaquebits
+      bcc isxparent
+        sta PPUDATA
+        clc
+        bcc afterwrite
+      isxparent:
+        bit PPUDATA
+      afterwrite:
+      adc #1
+      dex
+      bne tileloop
+    cpy #8
+    bcc rowloop
+
+  ldx bldg_id
+  dex
+  bpl bldgloop
+  rts
+.endproc
+
+.proc cut_draw_dialogue_frame
+  ldy #0
+  ldx popslide_used
+  copyloop:
+    lda dialogue_frame_strips,y
+    sta popslide_buf,x
+    inx
+    iny
+    cpy #dialogue_frame_strips_end-dialogue_frame_strips
+    bcc copyloop
+  stx popslide_used
+.endproc
+.proc cut_clear_dialogue
+  lda #$81
+  sta cutscene_vram_dst_lo
+  ; Add 4 Popslide packets, one to clear each line of text
+  ldy #4
+  ldx popslide_used
+  rowloop:
+    lda #>DIALOGUE_TOPLEFT
+    sta popslide_buf+0,x
+    lda cutscene_vram_dst_lo
+    sta popslide_buf+1,x
+    clc
+    adc #32
+    sta cutscene_vram_dst_lo
+    lda #29|$40
+    sta popslide_buf+2,x
+    lda #' '
+    sta popslide_buf+3,x
+    inx
+    inx
+    inx
+    inx
+    dey
+    bne rowloop
+  stx popslide_used
+  rts
+.endproc
+
+.proc cut_draw_trees
+treexpos = $00
+  ldy #8
+  lda #116
+  jsr one_tree
+  lda #164
+one_tree:
+  sec
+  sbc cutscene_x_scroll
+  sta treexpos
+  ldx #tree_oam_end-tree_oam-4
+  oamloop:
+    lda tree_oam+3,x
+    clc
+    adc treexpos
+    sta OAM+3,y
+    lda tree_oam+2,x
+    sta OAM+2,y
+    lda tree_oam+1,x
+    sta OAM+1,y
+    lda tree_oam+0,x
+    sta OAM+0,y
+    iny
+    iny
+    iny
+    iny
+    dex
+    dex
+    dex
+    dex
+    bpl oamloop
+  rts
 .endproc
 
 .proc load_cutscene
@@ -210,6 +409,7 @@ main_loop:
   doneFading:
     jsr cut_handle_state
   skipHandleScript:
+  jsr cut_draw_trees
 
   lda nmis
   vw:
@@ -223,7 +423,7 @@ main_loop:
   jsr popslide_terminate_blit
   lda #VBLANK_NMI|BG_1000|OBJ_1000
   ldy #0
-  ldx #0
+  ldx cutscene_x_scroll
   sec
   jsr ppu_screen_on
 
@@ -248,8 +448,18 @@ main_loop:
     bit $2002
     bmi s0waitfail
     bvc s0wait1
+  ; Change the bank immediately; change the scroll 16 lines later
   lda #VBLANK_NMI|BG_0000|OBJ_1000
   sta PPUCTRL
+  ldy #16*341/3/8
+  posts0wait:
+    bit $00
+    dey
+    bne posts0wait
+  lda #0
+  sta PPUSCROLL
+  bit PPUSTATUS
+  
 s0waitfail:
 
   ; Adjust fade amount
@@ -278,7 +488,7 @@ bail:
 
 .proc cut_handle_state
   lda #$FF
-  sta OAM+cutscene_init_oam_end-cutscene_init_oam-4
+  sta OAM+4  ; Y coordinate of A Button indicator
   ldx gameState
   lda handlers+1,x
   pha
@@ -372,11 +582,12 @@ handlers:
 .endproc
 
 .proc cut_handle_state_wait_a
+  ; Flash A Button indicator into place
   lda nmis
   and #%00011000
   beq no_show_marker
   lda #PRESS_A_MARKER_Y - 1
-  sta OAM+cutscene_init_oam_end-cutscene_init_oam-4
+  sta OAM+4
 no_show_marker:
   lda mouseEnabled
   beq not_pressed_lmb
@@ -389,49 +600,19 @@ no_show_marker:
   beq not_pressed_A
   pressed_A:
 
-    ; If the script has ended (high byte 0), go to fadeout
+    ; If the script has ended (high byte 0), go to fadeout.
+    ; Otherwise clear the screen and load the next paragraph.
     lda script_ptr+1
-    bne script_not_done
-      lda #FADEOUT_SPEED
-      sta cutFadeDir
-      rts
-    script_not_done:
-
-    ; The script is not done; it needs the screen cleared
-    ; for the next paragraph.
-    lda #$81
-    sta cutscene_vram_dst_lo
-    jmp cut_handle_state_cls
+    bne cut_handle_state_cls
+    lda #FADEOUT_SPEED
+    sta cutFadeDir
   not_pressed_A:
   rts
 .endproc
 
 .proc cut_handle_state_cls
-  ; Add 4 Popslide packets, one to clear each line of text
-  ldy #4
-  ldx popslide_used
-  rowloop:
-    lda #>DIALOGUE_TOPLEFT
-    sta popslide_buf+0,x
-    lda cutscene_vram_dst_lo
-    sta popslide_buf+1,x
-    clc
-    adc #32
-    sta cutscene_vram_dst_lo
-    lda #29|$40
-    sta popslide_buf+2,x
-    lda #' '
-    sta popslide_buf+3,x
-    inx
-    inx
-    inx
-    inx
-    dey
-    bne rowloop
-  stx popslide_used
-  ; and fall through to
+  jsr cut_clear_dialogue
 .endproc
-
 .proc cut_handle_state_new_graph
 src = 0
 
@@ -640,30 +821,57 @@ randpull3:
   rts  
 .endproc
 
-
 .segment "RODATA"
 
-cutscene_pkb:
-  .incbin "src/cutscene.pkb"
+dialogue_frame_strips:
+  .dbyt $2261,$40B0  ; Top row
+  .dbyt $2262,$5BB8
+  .dbyt $227E,$40B1
+  .dbyt $2301,$40B6  ; Bottom row
+  .dbyt $2302,$5BBB
+  .dbyt $231E,$40B7
+  .dbyt $2280  ; Left side
+  .byte $83,$B2,$B9,$B9,$B4
+  .dbyt $229F  ; Right side
+  .byte $83,$B3,$BA,$BA,$B5
+  .dbyt $21AC  ; Tree trunks
+  .byte $82,$F4,$F4,$F6
+  .dbyt $21AD
+  .byte $82,$F5,$F5,$F7
+  .dbyt $21B2
+  .byte $82,$F4,$F4,$F6
+  .dbyt $21B3
+  .byte $82,$F5,$F5,$F7
+  .dbyt $25AC
+  .byte $82,$F4,$F4,$F6
+  .dbyt $25AD
+  .byte $82,$F5,$F5,$F7
+  .dbyt $25B2
+  .byte $82,$F4,$F4,$F6
+  .dbyt $25B3
+  .byte $82,$F5,$F5,$F7
+dialogue_frame_strips_end:
+
+
+houseShapeBig:
+  .word $C0F0,$D0F0,$E0F0,$F0F0  ; house shape $80
+  .word $C4E0,$D4F0,$E4F0,$FCF0  ; house shape $82
+  .word $C8F0,$D8F0,$E8F0,$F8F0  ; house shape $84
+  .word $CC70,$DCF0,$ECF0,$FCF0  ; house shape $86
+  .word $80F0,$90F0,$A0F0,$B0F0  ; left silo
+  .word $8460,$94F0,$A4F0,$B4F0  ; right silo
+  .word $0000,$0000,$B8F0,$BCF0  ; destroyed house
 
 cutscene_init_oam:
   .byt 126,$01,$21,248  ; sprite 0 for CHR split
-  .byt 118,$55,$01,  0
-  .byt 110,$54,$01,  0
-  .byt 102,$55,$81,  0
-  .byt 118,$55,$01,  0
-  .byt 110,$54,$01,  0
-  .byt 102,$55,$81,  0
-  .byt  95,$53,$20,  0
-  .byt  95,$52,$60,  8
-  .byt  87,$51,$20,  0
-  .byt  87,$50,$60,  8
-  .byt  79,$50,$60,  4
-  .byt  79,$51,$20,  0
-  .byt 118,$55,$01,240
+  .byt 255,$56,$02,232  ; last entry is "press A" marker
+cutscene_init_oam_end:
+
+tree_oam:
+  .byt 118,$55,$01,240  ; trunk
   .byt 110,$54,$01,240
   .byt 102,$55,$81,240
-  .byt  95,$52,$20,232
+  .byt  95,$52,$20,232  ; leafy parts
   .byt  95,$53,$20,240
   .byt  95,$52,$60,248
   .byt  87,$50,$20,232
@@ -671,8 +879,7 @@ cutscene_init_oam:
   .byt  87,$50,$60,248
   .byt  79,$50,$20,236
   .byt  79,$50,$60,244
-  .byt   0,$56,$02,232  ; last entry is "press A" marker
-cutscene_init_oam_end:
+tree_oam_end:
 
 cutscene_palette:
   .byt $22,$18,$2A,$0F  ; grass and text

@@ -13,7 +13,7 @@ version = 0.04wip
 objlist = popslide16 \
           main random levels smoke bg missiles explosion scurry \
           title practice cutscene dtescripts \
-          math bcd kinematics unpkb undte pads mouse ppuclear \
+          math bcd kinematics undte pads mouse ppuclear \
           paldetect pentlysound pentlymusic musicseq ntscPeriods
 
 CC65 = /usr/local/bin
@@ -103,7 +103,6 @@ $(objdir)/popslide.o: $(srcdir)/popslideinternal.inc
 
 # incbins
 
-$(objdir)/cutscene.o: src/cutscene.pkb
 $(objdir)/main.o: $(objdir)/maingfx.chr $(objdir)/cuthouses.chr
 
 # data conversion
