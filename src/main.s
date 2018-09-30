@@ -596,11 +596,29 @@ notYet:
 .endproc
 
 .proc doStateCutscene
-  ; and go to the next level
+  ; Go to the next level
   inc gameHour
   lda gameHour
   cmp #5
   bcc readyForNextLevel
+
+  ; Choose which house will be rebuilt
+  ldy houseToRebuild
+  bpl rebuildAlreadySet
+  jsr findRandomDestroyedHouse
+  cpy #NUM_BUILDINGS
+  bcc haveHouseToRebuild
+
+  ; If there's nothing to rebuild, point at a silo
+  lda gameDay
+  lsr a
+  lda #BUILDING_SILO0
+  bcc haveHouseToRebuild
+  lda #BUILDING_SILO1
+haveHouseToRebuild:
+  sty houseToRebuild
+  sty debugHex2
+rebuildAlreadySet:
 
   ; Check if we're still on the perfect run track
   lda gameDay
@@ -688,11 +706,13 @@ readyForNextLevel:
   ora bgDirty
   sta bgDirty
 
-  jsr findRandomDestroyedHouse
-  cpy #NUM_BUILDINGS
-  bcs nothingToRebuild
-
-  ; rebuild house #Y
+  ; choose a house to rebuild
+  ldy houseToRebuild
+  bmi nothingToRebuild
+  lda #$FF
+  sta houseToRebuild
+  lda housesStanding,y  ; probably a silo
+  bne nothingToRebuild
   lda #1
   sta housesStanding,y
   lda #4

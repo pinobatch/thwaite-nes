@@ -12,6 +12,9 @@ OAM = $0200
 ; building with a !
 SHOW_THREATENED = 0
 
+; Turn this on to show a C0DE at bottom center
+BG_USE_DEBUGHEX = 1
+
 ; Turn this on to annoy Nova
 CHECK_ILLEGAL_MISSILES = 1
 ILLEGAL_MISSILES_TIP = 13
@@ -75,7 +78,7 @@ BG_DIRTY_PRACTICE_METER = $08
 .global housesStanding, houseX, houseShape, score1s, score100s
 .global gameDay, gameHour, gameMinute, gameSecond, gameTenthSecond, gameSubTenth
 .global bgDirty, curTip, tipTimeLeft
-.global buildingsDestroyedThisLevel, firstDestroyedHouse
+.global buildingsDestroyedThisLevel, firstDestroyedHouse, houseToRebuild
 .global main_palette
 ; bg methods
 .global setupGameBG, blitBGUpdate, buildBGUpdate, buildLevelRewardBar

@@ -598,7 +598,7 @@ findHitBuilding:
   bne findHitBuilding
 gotHitBuilding:
   lda housesStanding,y
-  beq wasAlreadyDestroyed
+  beq repairAlreadyScheduled
   inc buildingsDestroyedThisLevel
   lda #BUILDING_DESTROYED  ; equals 0
   sta housesStanding,y
@@ -606,27 +606,30 @@ gotHitBuilding:
   ; If it's a silo, set the number of missiles to 0.
   cpy #BUILDING_SILO0
   bne notSilo0
-  sta siloMissilesLeft
-  beq wasAlreadyDestroyed
+  sta siloMissilesLeft+0
+  beq repairAlreadyScheduled
 notSilo0:
   cpy #BUILDING_SILO1
   bne notSilo1
   sta siloMissilesLeft+1
-  beq wasAlreadyDestroyed
+  beq repairAlreadyScheduled
 notSilo1:
 
-  ; Otherwise, if it's the first house to be destroyed,
-  ; record that fact.
+  ; Otherwise, if it's the first house to be destroyed in the game
+  ; or in a morning, record that fact.
   bit firstDestroyedHouse
   bpl wasAlreadyDestroyed
-  sty firstDestroyedHouse
-;  sty debugHex1
-wasAlreadyDestroyed:
+    sty firstDestroyedHouse
+  wasAlreadyDestroyed:
+  bit houseToRebuild
+  bpl repairAlreadyScheduled
+    sty houseToRebuild
+  repairAlreadyScheduled:
 
-; destroy the missile
+  ; destroy the missile
   lda #0
   sta missileYHi,x
-; and set things up for a redraw
+  ; and schedule a redraw
   lda #BG_DIRTY_STATUS|BG_DIRTY_HOUSES
   ora bgDirty
   sta bgDirty
@@ -684,7 +687,7 @@ isBalloon:
   ldy missileTarget,x
   cmp houseX,y
   bcc noSmoke
-  jmp splitBalloon
+  ;jmp splitBalloon
 .endproc
 .proc splitBalloon
   stx 2

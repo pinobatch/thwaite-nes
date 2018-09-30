@@ -27,7 +27,6 @@
 BG_GRASSNUM = $C0
 TILE_BETWEEN_HOUSES = $8F
 BUILDING_WRECKAGE_TILE = $9E
-BG_USE_DEBUGHEX = 0
 BG_GRASSO = BG_GRASSNUM+0
 BG_GRASSA = BG_GRASSNUM+10
 BG_GRASSB = BG_GRASSNUM+11
@@ -70,6 +69,7 @@ curTip: .res 1
 tipTimeLeft: .res 1
 siloMissilesLeft: .res 2
 firstDestroyedHouse: .res 1
+houseToRebuild: .res 1
 
 .segment "CODE"
 .proc setupGameBG
@@ -604,6 +604,9 @@ copynamedone:
     lda #0
     sta houseXferDstHi
   noblit:
+  lda houseToRebuild
+  sta debugHex1
+
 .if ::BG_USE_DEBUGHEX
   lda #$23
   sta PPUADDR
@@ -612,13 +615,7 @@ copynamedone:
   lda debugHex1
   jsr puthex
   lda debugHex2
-  jsr puthex
-.endif
-  rts
-.endproc
-
-.if BG_USE_DEBUGHEX
-.proc puthex
+puthex:
   pha
   lsr a
   lsr a
@@ -630,9 +627,11 @@ copynamedone:
   and #$0F
   ora #BG_GRASSNUM
   sta PPUDATA
-  rts  
-.endproc
+  rts
+.else
+  rts
 .endif
+.endproc
 
 .proc newGame
   lda #BUILDING_OK
@@ -642,6 +641,7 @@ copynamedone:
   dex
   bpl :-
   stx firstDestroyedHouse  ; bit 7 set: nothing destroyed yet
+  stx houseToRebuild       ; bit 7 set: nothing destroyed yet
   lda #SKIP_TO_DAY
   sta gameDay
   lda #0
