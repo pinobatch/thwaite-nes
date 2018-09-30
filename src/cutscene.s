@@ -32,6 +32,7 @@ decomp_buf_pos: .res 1
 cutscene_vram_dst_lo: .res 1
 cutscene_vram_dst_hi: .res 1
 cutscene_x_scroll: .res 1
+cutscene_x_scroll_target: .res 1
 ; cutStateTimer = tipTimeLeft
 
 CUT_STATE_SCRIPT = 0
@@ -59,13 +60,39 @@ cutscene_actors: .res 4
 
 .segment "CODE"
 
+.if CUT_SCROLL_DEBUGGING
+.proc rechoose_scroll
+  ; Set initial scroll position
+  ldy houseToRebuild
+  iny
+  cpy #NUM_BUILDINGS
+  bcc :+
+    ldy #0
+  :
+  sty houseToRebuild
+  lda houseScrollX,y
+  sta cutscene_x_scroll_target
+  sta cutscene_x_scroll
+  rts
+.endproc
+.endif
+
 .proc load_cutscene_bg
+
+  ; Set initial scroll position
+  ldy houseToRebuild
+  bpl :+
+    ldy #BUILDING_SILO1
+  :
+  lda houseScrollX,y
+  sta cutscene_x_scroll_target
+  eor #$80
+  sta cutscene_x_scroll
+
   lda #<-FADEIN_SPEED
   sta cutFadeDir
   lda #FADEIN_START
   sta cutFadeAmount
-  lda #114
-  sta cutscene_x_scroll
 
   ; turn off rendering
   lda #VBLANK_NMI
@@ -409,6 +436,21 @@ main_loop:
   doneFading:
     jsr cut_handle_state
   skipHandleScript:
+
+  ; Move the camera
+  lda nmis
+  lsr a
+  bcs no_update_scroll
+  lda cutscene_x_scroll_target
+  cmp cutscene_x_scroll
+  beq no_update_scroll
+    lda #0
+    adc #$FF
+    ora #$01
+    clc
+    adc cutscene_x_scroll
+    sta cutscene_x_scroll
+  no_update_scroll:
   jsr cut_draw_trees
 
   lda nmis
@@ -433,6 +475,15 @@ main_loop:
     ldx #0
     jsr read_mouse
   no_read_mouse:
+
+  .if ::CUT_SCROLL_DEBUGGING
+    lda new_keys
+    and #KEY_RIGHT
+    beq notRight
+      jsr rechoose_scroll
+    notRight:
+  .endif
+
   lda new_keys
   and #KEY_START
   beq notStart
@@ -822,6 +873,9 @@ randpull3:
 .endproc
 
 .segment "RODATA"
+
+houseScrollX:
+  .byte 16, 24,   40,   88, 104, 120, 136, 152, 168,   216,   232, 240
 
 dialogue_frame_strips:
   .dbyt $2261,$40B0  ; Top row

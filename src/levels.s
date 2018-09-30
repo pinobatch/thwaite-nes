@@ -189,6 +189,10 @@ copyloop:
   sta levelMissileSpeed,y
   dey
   bpl copyloop
+  .if ::ONE_AMMO
+    lda #1
+    sta enemyMissilesLeft
+  .endif
 
   ; Make missiles 18.75% faster on PAL (approximating 20%).
   ; A still contains missile speed

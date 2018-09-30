@@ -612,9 +612,9 @@ notYet:
   ; If there's nothing to rebuild, point at a silo
   lda gameDay
   lsr a
-  lda #BUILDING_SILO0
+  ldy #BUILDING_SILO0
   bcc haveHouseToRebuild
-  lda #BUILDING_SILO1
+  ldy #BUILDING_SILO1
 haveHouseToRebuild:
   sty houseToRebuild
   sty debugHex2

@@ -8,12 +8,17 @@
 xferBuf = $0100
 OAM = $0200
 
-; Turn this on to replace the upper left tile of a threatened
-; building with a !
+; Replace the upper left tile of a threatened building with a !
 SHOW_THREATENED = 0
 
-; Turn this on to show a C0DE at bottom center
-BG_USE_DEBUGHEX = 1
+; Show a C0DE at bottom center
+BG_USE_DEBUGHEX = 0
+
+; Breeze through the game when testing things
+ONE_AMMO = 0
+
+; Enable Right to change (and scroll to) the house to rebuild
+CUT_SCROLL_DEBUGGING = 0
 
 ; Turn this on to annoy Nova
 CHECK_ILLEGAL_MISSILES = 1
