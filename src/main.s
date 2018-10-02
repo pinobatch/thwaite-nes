@@ -617,7 +617,6 @@ notYet:
   ldy #BUILDING_SILO1
 haveHouseToRebuild:
   sty houseToRebuild
-  sty debugHex2
 rebuildAlreadySet:
 
   ; Check if we're still on the perfect run track

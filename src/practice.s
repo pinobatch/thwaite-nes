@@ -33,6 +33,7 @@ practiceHour: .res 1
 .segment "CODE"
 
 .proc practice_menu
+  jsr clearAllMissiles  ; initialize cursor position and velocity
   lda practiceDay
   sta gameDay
   lda practiceHour

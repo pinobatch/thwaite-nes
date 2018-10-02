@@ -604,8 +604,6 @@ copynamedone:
     lda #0
     sta houseXferDstHi
   noblit:
-  lda houseToRebuild
-  sta debugHex1
 
 .if ::BG_USE_DEBUGHEX
   lda #$23
