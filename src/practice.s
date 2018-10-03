@@ -49,6 +49,18 @@ practiceHour: .res 1
   sta 1
   jsr display_textfile
 loop:
+
+  ; Load this level's info if it has changed
+  lda gameState
+  cmp #STATE_NEW_LEVEL
+  bne noReloadLevel
+  jsr practiceSetSide
+    jsr doStateNewLevel
+    lda #BG_DIRTY_STATUS|BG_DIRTY_HOUSES|BG_DIRTY_PRACTICE_METER
+    ora bgDirty
+    sta bgDirty
+  noReloadLevel:
+
   ldx #0
   stx oam_used
   jsr moveCrosshairPlayerX
@@ -84,16 +96,6 @@ loop:
   jsr practiceDoClick
   
 noClick:
-
-  lda gameState
-  cmp #STATE_NEW_LEVEL
-  bne noReloadLevel
-  jsr practiceSetSide
-  jsr doStateNewLevel
-  lda #BG_DIRTY_STATUS|BG_DIRTY_HOUSES|BG_DIRTY_PRACTICE_METER
-  ora bgDirty
-  sta bgDirty
-noReloadLevel:
 
   lda new_keys
   and #KEY_START

@@ -145,18 +145,26 @@ done:
 .endproc
 
 .proc titleScreen
-  jsr display_todo
-  lda #VBLANK_NMI
+  ; display_todo calls the title_detect_mice version of controller
+  ; reading, which updates player 1's cursor position as if the
+  ; title screen were running.  Mesen debugger complains that the
+  ; cursor's position isn't initialized the first time through.
+  lda #128
   sta crosshairYHi+0
   sta crosshairXHi+0
-  ldx #$00
+  jsr display_todo
+
+  ldx #1
+  stx numPlayers
+  dex
+  lda #VBLANK_NMI
   ldy #$3F
   sta PPUCTRL
   stx PPUMASK
   sty PPUADDR
   stx PPUADDR
-  lda #1
-  sta numPlayers
+  sta crosshairYHi+0
+  sta crosshairXHi+0
 copypal:
   lda title_palette,x
   sta PPUDATA
@@ -193,15 +201,16 @@ copypal:
     cpy #titlestripsend-titlestrips
     bcc incstriploop
 
+  ; The 1, 2, and P down the left side
+  ; sec
   lda #VBLANK_NMI|VRAM_DOWN
   sta PPUCTRL
   lda #$22
   sta PPUADDR
   lda #$4B
   sta PPUADDR
-  lda #$60
+  lda #$60  ; top of "1" tile
   ldy #3
-  sec
   playercountloop:
     sta PPUDATA
     ora #$10
@@ -219,17 +228,13 @@ loop:
   bit PPUSTATUS
   
   ldy #0
-  lda #VBLANK_NMI|BG_0000|OBJ_1000
   ldx #>OAM
   sty OAMADDR
-  sty PPUSCROLL
-  sty PPUSCROLL
-  sta PPUCTRL
   stx OAM_DMA
-
-  ldx #BG_ON|OBJ_ON
-  stx PPUMASK
-
+  ldx #0
+  lda #VBLANK_NMI|BG_0000|OBJ_1000
+  sec
+  jsr ppu_screen_on
   jsr pently_update
   jsr read_pads
   jsr title_detect_mice

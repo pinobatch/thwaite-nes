@@ -24,11 +24,6 @@ LD65 = ld65
 DEBUGEMU := ~/.wine/drive_c/Program\ Files\ \(x86\)/FCEUX/fceux.exe
 EMU := fceux
 CC = gcc
-ifdef COMSPEC
-DOTEXE=.exe
-else
-DOTEXE=
-endif
 CFLAGS = -std=gnu99 -Wall -DNDEBUG -O
 CFLAGS65 = 
 objdir = obj/nes
@@ -68,12 +63,13 @@ clean:
 # for when something was changed.  Limitation: it won't see changes
 # to docs or tools.
 $(title)-$(version).zip: \
-  zip.in $(title).nes $(title)128.nes README.html $(objdir)/index.txt
+  zip.in $(title).nes $(title)128.nes README.md USAGE.html $(objdir)/index.txt
 	zip -9 -u $@ -@ < $<
 
 # Build zip.in from the list of files in the Git tree
 zip.in:
 	git ls-files | grep -e "^[^.]" > $@
+	echo $(title).nes >> $@
 	echo zip.in >> $@
 
 # Some unzip tools won't create empty folders, so put a file there.
