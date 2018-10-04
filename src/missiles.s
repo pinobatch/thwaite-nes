@@ -461,6 +461,7 @@ notDXNeg:
   sta missileDYHi,x
   lda #0
   sta missileYLo,x
+  sta missileXLo,x
   sta 1
   lda missileXHi,x
   sta 0

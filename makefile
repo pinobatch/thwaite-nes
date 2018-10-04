@@ -22,10 +22,11 @@ LD65 = ld65
 #EMU := "/C/Program Files/nintendulator/Nintendulator.exe"
 #EMU := mednafen -nes.pal 0 -nes.input.port1 gamepad -nes.input.port2 gamepad
 DEBUGEMU := ~/.wine/drive_c/Program\ Files\ \(x86\)/FCEUX/fceux.exe
+DEBUGEMU2 := Mesen.exe
 EMU := fceux
 CC = gcc
 CFLAGS = -std=gnu99 -Wall -DNDEBUG -O
-CFLAGS65 = 
+CFLAGS65 = -g
 objdir = obj/nes
 srcdir = src
 imgdir = tilesets
@@ -49,6 +50,8 @@ run: $(title).nes
 	$(EMU) $<
 debug: $(title).nes
 	$(DEBUGEMU) $<
+debug2: $(title).nes
+	$(DEBUGEMU2) $<
 all: $(title).nes $(title)128.nes
 dist: zip
 zip: $(title)-$(version).zip
@@ -79,10 +82,10 @@ $(objdir)/index.txt: makefile CHANGES.txt
 # forming the ROM
 
 map.txt $(title).nes: nrom256.x $(objdir)/nrom256.o $(objlistntsc)
-	$(LD65) -o $(title).nes -m map.txt -C $^
+	$(LD65) -o $(title).nes -m map.txt --dbgfile $(title).dbg -C $^
 
 map128.txt $(title)128.nes: nrom128.x $(objdir)/nrom128.o $(objlistntsc)
-	$(LD65) -o $(title)128.nes -m map128.txt -C $^
+	$(LD65) -o $(title)128.nes -m map128.txt --dbgfile $(title)128.dbg -C $^
 
 # assembly language
 

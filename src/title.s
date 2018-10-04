@@ -147,11 +147,14 @@ done:
 .proc titleScreen
   ; display_todo calls the title_detect_mice version of controller
   ; reading, which updates player 1's cursor position as if the
-  ; title screen were running.  Mesen debugger complains that the
-  ; cursor's position isn't initialized the first time through.
-  lda #128
-  sta crosshairYHi+0
-  sta crosshairXHi+0
+  ; title screen were running.  Though this cursor position is never
+  ; displayed, Mesen's debugger still complains that the position
+  ; isn't initialized the first time through.
+  .if ::PEDANTIC_RAM_INIT
+    lda #128
+    sta crosshairYHi+0
+    sta crosshairXHi+0
+  .endif
   jsr display_todo
 
   ldx #1
@@ -174,6 +177,7 @@ copypal:
 
   ldx #$04
   jsr ppu_clear_oam
+  ; ldx #0  ; after ppu_clear_oam
   txa
   tay
   ldx #$20

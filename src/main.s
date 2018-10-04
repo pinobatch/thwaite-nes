@@ -122,6 +122,14 @@ vwait1:
   txa
 clear_zp:
   sta $00,x
+  .if ::PEDANTIC_RAM_INIT
+    ; If the Y coordinate is out of bounds ($F0-$FF), the tile,
+    ; color/flip, and X bytes of the same entry will never be used,
+    ; but Mesen complains anyway when copying shadow OAM to OAM.
+    ; Initialize shadow OAM to all $00 while looking for more serious
+    ; uninitialized RAM issues.
+    sta OAM,x
+  .endif
   inx
   bne clear_zp
 

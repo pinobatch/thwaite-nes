@@ -20,6 +20,10 @@ ONE_AMMO = 0
 ; Enable Right to change (and scroll to) the house to rebuild
 CUT_SCROLL_DEBUGGING = 0
 
+; Initialize RAM regions that aren't strictly necessary but serve
+; to shut up Mesen
+PEDANTIC_RAM_INIT = 1
+
 ; Turn this on to annoy Nova
 CHECK_ILLEGAL_MISSILES = 1
 ILLEGAL_MISSILES_TIP = 13
