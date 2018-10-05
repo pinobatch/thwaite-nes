@@ -4,7 +4,8 @@
 *.chr
 /obj/nes/*.s
 /zip.in
-*.nes.deb
+/*.nes.deb
+/*.dbg
 /map.txt
 /map128.txt
 /nsfmap.txt

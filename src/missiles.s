@@ -520,10 +520,12 @@ notAfter9:
 .endproc
 
 .proc moveMissileNumberX
+  ; Missile slots with a zero Y position are free slots
   lda missileYHi,x
   bne missileExists
-  rts
-missileExists:
+    rts
+  missileExists:
+
   clc
   lda missileXLo,x
   adc missileDXLo,x
@@ -708,6 +710,7 @@ available2:
   sta missileXHi,x
   lda #0
   sta missileYLo,x
+  sta missileXLo,x
   sta missileDXHi,y
   sta missileDXHi,x
   sta missileDYHi,x
@@ -796,12 +799,12 @@ noMiddle:
   rts
 notTooHigh:
 
-mirvTargets = 6
-mirvsLeft = 8
-parentSlot = 10
-newSlot = 11
-mirvDX = 12
-mirvDXSign = 13
+mirvTargets = $06
+mirvsLeft   = $08
+parentSlot  = $0A
+newSlot     = $0B
+mirvDX      = $0C
+mirvDXSign  = $0D
 
   ; Place one missile either one to the left or
   ; two to the right of this one.
@@ -827,12 +830,12 @@ notBefore3:
   
   stx parentSlot
   ldy #1
-  sty mirvsLeft
+  sty mirvsLeft  ; takes on values 1 then 0
 mirvsLoop:
   jsr findMissileSlot
   bcc notFull
-  jmp bail
-notFull:
+    jmp bail
+  notFull:
   stx newSlot
   ldy mirvsLeft
 
@@ -1181,6 +1184,7 @@ foundEmptySlot:
   lda #0
   sta missileType,y
   sta missileYLo,y
+  sta missileXLo,y
   lda #SILO_Y
   sta missileYHi,y
   lda 2
