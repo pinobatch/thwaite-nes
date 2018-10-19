@@ -1,29 +1,38 @@
-0.04 (2013)
-* Expanded to 32 KiB PRG (with 8 KiB reserved for CHR RAM boards)
-* Chained certain initialization functions
-* Grouped functions into conceptual sections using a call graph
-* Fixed failure to initialize missileType for player missiles
+0.04 (2018-10-19)
+* Chain certain initialization functions
+* Group functions into conceptual sections using a call graph
+* Use other libraries I've since made (ppuclear, Popslide)
+* Pently audio: Rename subroutines to match the latest driver version
+* Build a second ROM as NROM-256 (32 KiB PRG ROM + 8 KiB CHR ROM),
+  with libraries in the top half, in case I build a multicart
+* Fix a bunch of uninitialized variables (#5; reported by jroatch)
+* Port build tools to Python 3
+* i18n: Move dialogue, tips, copyright screen, and practice menu text
+  to separate UTF-8 text files
+* Compress all text using DTE
+* Cut scene draws all 12 buildings and pans across them
+* Zipfile: No more zip bombing
 
 0.03 (2011-12-08)
-* Fixed crosshair braking failure
+* Fix crosshair braking failure
 * Can play game with a Super NES Mouse in either controller port
-* Switched to non-DPCM-safe controller reading code because the mouse
+* Switch to non-DPCM-safe controller reading code because the mouse
   needs it
 * A button icon blinks after cut scenes dialogue finishes drawing
 * Practice mode to start on any level
-* Draws much of 3x3-tile explosions with sprite flipping to save CHR
-* CHR rearranged to allow for more distinct tiles in cut scenes
+* Draw 3x3-tile explosions with sprite flipping to save CHR
+* Rearrange CHR to allow for more distinct tiles in cut scenes
 * Music for 05:00
 * Two ! alert sounds don't play at the same time
 * Some later levels are harder
 * I am within 256 bytes of filling PRG ROM
 
 0.02 (2011-08-26)
-* Includes source code, partly under GPLv3 and partly under an
+* Publish source code, partly under GPLv3 and partly under an
   all-permissive license
-* Added HTML5 manual
-* Added music for 04:00 and daytime
-* Dual channel drums for stronger kick and snare
+* Add HTML manual
+* Add music for 04:00 and daytime
+* Audio: Add dual channel drums for stronger kick and snare
 * Villagers warp to houses after each hour, making it clearer that an
   hour has passed
 

@@ -9,7 +9,7 @@
 # This file is offered as-is, without any warranty.
 #
 title = thwaite
-version = 0.04wip
+version = 0.04
 objlist = popslide16 \
           main random levels smoke bg missiles explosion scurry \
           title practice cutscene dtescripts \
@@ -67,12 +67,13 @@ clean:
 # to docs or tools.
 $(title)-$(version).zip: \
   zip.in $(title).nes $(title)128.nes README.md USAGE.html $(objdir)/index.txt
-	zip -9 -u $@ -@ < $<
+	$(PY) tools/zipup.py $< $(title)-$(version) -o $@
 
 # Build zip.in from the list of files in the Git tree
 zip.in:
 	git ls-files | grep -e "^[^.]" > $@
 	echo $(title).nes >> $@
+	echo $(title)128.nes >> $@
 	echo zip.in >> $@
 
 # Some unzip tools won't create empty folders, so put a file there.
