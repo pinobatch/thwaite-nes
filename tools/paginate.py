@@ -301,7 +301,7 @@ def main(argv=None):
     all_lines = []
     all_parsed = []
     for infilename, (parsefunc, outfunc) in jobs:
-        with open(infilename) as infp:
+        with open(infilename, "r", encoding="utf-8") as infp:
             pages = list(lines_to_docs(infp))
         parsed, ltc = parsefunc(pages)
         all_parsed.append((outfunc, parsed, len(ltc)))
@@ -335,7 +335,7 @@ dte_replacements:
     if outfile == '-':
         sys.stdout.writelines(all_out)
     else:
-        with open(outfile, "w") as outfp:
+        with open(outfile, "w", encoding="utf-8") as outfp:
             outfp.writelines(all_out)
 
 if __name__=='__main__':
