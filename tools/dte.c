@@ -361,6 +361,7 @@ enum {
 
 size_t compress_dte(uint8_t *data, size_t data_size, uint8_t *digram_table, int min_freq) {
   int i, n;
+  size_t data_index;
   uint8_t c, l, r;
     uint16_t d;
   int digram_count[65536] = {0};
@@ -386,10 +387,10 @@ size_t compress_dte(uint8_t *data, size_t data_size, uint8_t *digram_table, int 
 
   if (verbosity_level >= 4)
     fprintf(stderr, "Counting character digrams.\n");
-  for (i = 0; i < data_size-1; ++i) {
-    r = data[i+0];
+  for (data_index = 0; data_index < data_size-1; ++data_index) {
+    r = data[data_index+0];
     avaliable_digram[r] = false;
-    l = data[i+1];
+    l = data[data_index+1];
     /* counting in such a way that 3 of the same character
        will counted once and not twice, and 4 twice not three times */
     if (!possible_double_overlap) {
@@ -455,13 +456,12 @@ int main (int argc, char *argv[])
   FILE *input_file = NULL;
   FILE *output_file = NULL;
   FILE *table_file = NULL;
-  int i;
+  int i, n;
   uint8_t *data = NULL;
   size_t data_size;
   uint8_t char_digram_table[512];
   uint8_t *output_data = NULL;
   size_t output_data_size = 0;
-  size_t n;
 
   bool decode = false;
   bool overwrite_output_file = false;
