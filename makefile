@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 #
 # Makefile for Thwaite
-# Copyright 2011-2017 Damian Yerrick
+# Copyright 2011-2019 Damian Yerrick
 #
 # Copying and distribution of this file, with or without
 # modification, are permitted in any medium without royalty
@@ -24,12 +24,12 @@ LD65 = ld65
 DEBUGEMU := ~/.wine/drive_c/Program\ Files\ \(x86\)/FCEUX/fceux.exe
 DEBUGEMU2 := Mesen.exe
 EMU := fceux
-CC = gcc
-CFLAGS = -std=gnu99 -Wall -DNDEBUG -O
-CFLAGS65 = -g
-objdir = obj/nes
-srcdir = src
-imgdir = tilesets
+CC := gcc
+CFLAGS := -std=gnu99 -Wall -Wextra -DNDEBUG -Os
+CFLAGS65 := -g
+objdir := obj/nes
+srcdir := src
+imgdir := tilesets
 
 # The Windows Python installer puts py.exe in the path, but not
 # python3.exe, which confuses MSYS Make.  COMSPEC will be set to
@@ -44,7 +44,7 @@ endif
 
 objlistntsc = $(foreach o,$(objlist),$(objdir)/$(o).o)
 
-.PHONY: run debug all dist zip clean
+.PHONY: run debug all dist zip clean ctools
 
 run: $(title).nes
 	$(EMU) $<
@@ -55,9 +55,11 @@ debug2: $(title).nes
 all: $(title).nes $(title)128.nes
 dist: zip
 zip: $(title)-$(version).zip
+ctools: tools/dte$(EXE)
 clean:
 	-rm $(objdir)/*.o $(objdir)/*.s $(objdir)/*.chr
 	-rm map128.txt map.txt
+	-rm tools/dte$(EXE)
 
 # packaging
 
@@ -122,6 +124,9 @@ $(objdir)/dtescripts.s: tools/paginate.py \
 	-t tips $(srcdir)/tips.txt \
 	-t text $(srcdir)/texts.txt \
 	-o $@
+
+tools/dte$(DOTEXE): tools/dte.c
+	$(CC) -static $(CFLAGS) -o $@ $^
 
 # graphics
 

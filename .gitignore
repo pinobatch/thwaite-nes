@@ -15,6 +15,8 @@ __pycache__/
 /thwaite128.nes
 /zip.in
 /thwaite-*.zip
+/tools/dte
+/tools/dte.exe
 
 # this is NES homebrew, not DSiWare
 *.DS_Store
