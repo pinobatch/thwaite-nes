@@ -2,7 +2,7 @@
 import sys
 import os
 import charset
-import dte
+import dtefe
 charset.register()  # as "thwaite"
 
 DTE_MIN_CODEUNIT = 128
@@ -311,7 +311,7 @@ def main(argv=None):
     all_out = []
     if use_dte:
         bytesbefore = sum(len(x) for x in all_lines)
-        all_lines, repls, _ = dte.dte_compress(all_lines, mincodeunit=DTE_MIN_CODEUNIT)
+        all_lines, repls, _ = dtefe.dte_compress(all_lines, mincodeunit=DTE_MIN_CODEUNIT)
         bytesafter = sum(len(x) for x in all_lines)
         print("compressed %d bytes to %d bytes"
               % (bytesbefore, bytesafter+256), file=sys.stderr)
