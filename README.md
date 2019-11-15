@@ -30,7 +30,7 @@ Credits
 
 Legal
 -----
-© 2011-2012 Damian Yerrick
+© 2011, 2012, 2018 Damian Yerrick
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -44,6 +44,9 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see [GNU licenses].
+
+Some source code files, those less specific to this game, are under
+a more permissive license similar in effect to the license of zlib.
 
 Thwaite makes explosions and smoke appear translucent by flickering
 them. A very small percentage of people have [seizures] after looking
