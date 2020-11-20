@@ -15,24 +15,21 @@ Side: Left  Right
 (Cancel)   (Play)
 
 == todo_txt ==
-Thwaite 0.04
+Thwaite 0.04a
 
-© 2011,2018 Damian YERRICK
+© 2011,2020 Damian YERRICK
 <thwaite@pineight.com>
 
 Comes with ABSOLUTELY NO 
 WARRANTY.  This is free
 software, and you are
-welcome to share it under
-certain conditions.
-For details, see LICENSE.txt
+welcome to share it subject
+to the terms of the GNU
+General Public License,
+version 3 or later.
 
-To do:
-* animate the cut scenes
-* attract mode
-* track missiles' spawn IDs
-  for double-kill tracking
-* github.com/pinobatch
-  /thwaite-nes/issues
+Source code and issue list:
+  github.com/pinobatch
+  /thwaite-nes
 
      Press Start Button

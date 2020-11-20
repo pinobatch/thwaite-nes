@@ -510,12 +510,20 @@ suffix:
 numHouses = $00
 addedPoints = $01
 highdigits = $00
+  lda numHouses
+  pha
+  lda addedPoints
+  pha
   ; First load the tip
   lda #2
   sta curTip
   lda #50
   sta tipTimeLeft
   jsr buildTipBar
+  pla
+  sta addedPoints
+  pla
+  sta numHouses
 
   ; Write the number of houses now, because bcd8bit
   ; destroys the value in 0
