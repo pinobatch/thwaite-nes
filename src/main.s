@@ -684,7 +684,7 @@ haveCutsceneNumberInA:
   jsr load_cutscene
   
   ; The cutscene code trashes gameState, the missile states, and the
-  ; background, so make sure those are set sanely before continuing.
+  ; background, so make sure those have values before continuing.
   jsr clearAllMissiles
   lda #STATE_REBUILDING_HOUSE
   sta gameState
