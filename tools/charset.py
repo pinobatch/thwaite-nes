@@ -9,10 +9,15 @@ name = 'thwaite'
 decoding_table = [
     # Some ASCII control characters
     # 0x00 and 0x0a are for termination and newline respectively
-    *range(28),
-    # copyright, rocket, unused, double pipe (technically alveolar
-    # click; used as substitute for "il" ligature)
-    0x00A9, 0x1F680, 0xFFFE, 0x01C1,
+    *range(26),
+    # Ligatures I' and ll.  Abuses code points:
+    # Í U+00CD LATIN CAPITAL LETTER I WITH ACUTE for I'
+    # ỻ U+1EFB LATIN SMALL LETTER MIDDLE-WELSH LL for ll
+    0x00CD, 0x1EFB,
+    # copyright, rocket, 's, il.  Abuses code points:
+    # ś U+015B LATIN SMALL LETTER S WITH ACUTE for the "'s" ligature
+    # ǁ U+01C1 LATIN LETTER LATERAL CLICK for the "il" ligature
+    0x00A9, 0x1F680, 0x015B, 0x01C1,
     # ASCII printable characters
     *range(32,127),
     # house building, in the place of ASCII DEL (which looks like a
@@ -77,12 +82,25 @@ def register():
 
 ### Testing
 
+def preencode(s):
+    s = s.replace("il", "ǁ")
+    s = s.replace("'s", "ś")
+    s = s.replace("I'", "Í")
+    s = s.replace("ll", "ỻ")
+    return s
+
 def main():
     register()
-    s = "© 2018 Damian Yerrick"
-    b = s.encode(name)
-    print(s)
-    print(b.hex())
+    tests = [
+        "© 2018 Damian Yerrick",
+        "Tilda's house has been rebuilt",
+    ]
+    for s in tests:
+        p = preencode(s)
+        b = p.encode(name)
+        print(s)
+        print(p)
+        print(b.hex())
 
 if __name__=='__main__':
     main()

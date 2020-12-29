@@ -13,7 +13,9 @@ def dte_compress(lines, compctrl=False, mincodeunit=128):
             unusedvalues.difference_update(line)
         delimiter = min(unusedvalues)
         delimiter = bytes([delimiter])
-    excluderange = "0x00-0x00" if compctrl else "0x00-0x1F"
+    excluderange = ("0x00-0x%02x" % (compctrl-1) if isinstance(compctrl, int)
+                    else "0x00-0x00" if compctrl
+                    else "0x00-0x1F")
     digramrange = "0x%02x-0xFF" % mincodeunit
     compress_cmd_line = [
         dte_path, "-c", "-e", excluderange, "-r", digramrange

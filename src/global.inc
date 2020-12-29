@@ -196,10 +196,10 @@ abl_keys = 6
 ; practice methods
 .global practice_menu
 
-; dte constants
+; dte constants; must match paginate.py
 DTE_OUTPUT_LEN = 32
 DTE_MIN_CODEUNIT = $80
-FIRST_PRINTABLE_CU = $1C
+FIRST_PRINTABLE_CU = $10
 ; dte fields
 dte_output_buf = $0180  ; temporary to get undte assembling
 ; dte methods

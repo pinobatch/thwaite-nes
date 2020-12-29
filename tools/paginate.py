@@ -5,7 +5,9 @@ import charset
 import dtefe
 charset.register()  # as "thwaite"
 
+# must match global.inc
 DTE_MIN_CODEUNIT = 128
+FIRST_PRINTABLE_CU = 16
 
 def ca65_bytearray(s):
     s = ['  .byte ' + ','.join("%3d" % ch for ch in s[i:i + 16])
@@ -44,6 +46,11 @@ def lines_to_docs(lines):
         del cur_page[-1]
     if cur_title: yield cur_title, cur_page
 
+def thwaite_enc(line):
+    p = charset.preencode(line)
+    s = p.encode("thwaite")
+    return s
+
 def parse_cutscripts(pages):
     lines_to_compress = []
     scripts = []
@@ -72,10 +79,7 @@ def parse_cutscripts(pages):
         speakers = "".join(speakers)
         scripts.append((title, speakers, cues))
 
-    lines_to_compress = [
-        line.replace("il","\u01C1").encode("thwaite")
-        for line in lines_to_compress
-    ]
+    lines_to_compress = [thwaite_enc(line) for line in lines_to_compress]
     return scripts, lines_to_compress
 
 def output_cutscripts(scripts, lines_to_compress):
@@ -113,7 +117,7 @@ def parse_text(pages):
     titles = []
     lines_to_compress = []
     for title, lines in pages:
-        enc = "\n".join(lines).replace("il","\u01C1").encode("thwaite")
+        enc = thwaite_enc("\n".join(lines))
         titles.append(title)
         lines_to_compress.append(enc)
     return titles, lines_to_compress
@@ -311,7 +315,9 @@ def main(argv=None):
     all_out = []
     if use_dte:
         bytesbefore = sum(len(x) for x in all_lines)
-        all_lines, repls, _ = dtefe.dte_compress(all_lines, mincodeunit=DTE_MIN_CODEUNIT)
+        all_lines, repls, _ = dtefe.dte_compress(all_lines,
+                                                 mincodeunit=DTE_MIN_CODEUNIT,
+                                                 compctrl=FIRST_PRINTABLE_CU)
         bytesafter = sum(len(x) for x in all_lines)
         print("compressed %d bytes to %d bytes"
               % (bytesbefore, bytesafter+256), file=sys.stderr)
