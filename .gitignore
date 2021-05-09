@@ -6,6 +6,8 @@
 /zip.in
 /*.nes.deb
 /*.dbg
+/*.cdl
+/*.ram.nl
 /map.txt
 /map128.txt
 /nsfmap.txt
