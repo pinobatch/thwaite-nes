@@ -3,6 +3,8 @@
 *~
 *.chr
 /obj/nes/*.s
+/obj/compressed_data
+/obj/uncompressed_data
 /zip.in
 /*.nes.deb
 /*.dbg
