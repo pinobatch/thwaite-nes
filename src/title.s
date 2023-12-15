@@ -27,6 +27,7 @@
 .global todo_txt
 
 B_TO_RESET = 0
+WITH_EXIT_OPTION = 0
 
 .segment "LIBCODE"
 ;;
@@ -94,10 +95,12 @@ copypal:
   bcc copypal
 
   ; clear nametable
-  lda #$20
-  tax
+  ; ldx #$20
+  txa
   ldy #$00
   jsr ppu_clear_nt
+  ldx #$FF
+  stx cur_keys+0
 
   lda #>todo_txt
   sta 1
@@ -143,6 +146,14 @@ no_mouse:
 done:
   rts
 .endproc
+
+TITLE_NUM_OPTIONS   = 3 + (WITH_EXIT_OPTION <> 0)
+TITLE_OPTION_LOG_HT = 4
+TITLE_MENU_LEFT   =  48
+TITLE_MENU_RIGHT  = 208
+TITLE_ARROW_X     =  76
+TITLE_MENU_TOP    = 128
+TITLE_MENU_BOTTOM = TITLE_MENU_TOP + ((TITLE_NUM_OPTIONS + 1) << TITLE_OPTION_LOG_HT)
 
 .proc titleScreen
   ; display_todo calls the title_detect_mice version of controller
@@ -277,6 +288,14 @@ doneClick:
   beq loop
 done:
 
+  .if ::WITH_EXIT_OPTION
+    lda numPlayers
+    cmp #4
+    bcc notExit
+      jmp ($FFFC)
+    notExit:
+  .endif
+
   ; mix the current time into the rng
   lda nmis
   eor rand3
@@ -293,16 +312,15 @@ handleClick:
   beq doneClick
   lda crosshairYHi+0
   sec
-  sbc #128
-  lsr a
-  lsr a
-  lsr a
-  lsr a
+  sbc #TITLE_MENU_TOP
+  .repeat ::TITLE_OPTION_LOG_HT
+    lsr a
+  .endrepeat
   
   ; Row 0: Change speed
   ; Row 1: 1 player; 2: 2 player; 3: Practice
   beq changeSpd
-  cmp #4
+  cmp #TITLE_NUM_OPTIONS+1
   bcs doneClick
   sta numPlayers
   jmp done
@@ -362,13 +380,13 @@ isMouse:
 mouseNotDown:
   clc
   adc crosshairYHi+0
-  cmp #128
+  cmp #TITLE_MENU_TOP
   bcs noClipTop
-  lda #128
+  lda #TITLE_MENU_TOP
 noClipTop:
-  cmp #191
+  cmp #TITLE_MENU_BOTTOM-1
   bcc noClipBottom
-  lda #191
+  lda #TITLE_MENU_BOTTOM-1
 noClipBottom:
   sta crosshairYHi+0
 
@@ -380,13 +398,13 @@ noClipBottom:
 mouseNotLeft:
   clc
   adc crosshairXHi+0
-  cmp #48
+  cmp #TITLE_MENU_LEFT
   bcs noClipLeft
-  lda #48
+  lda #TITLE_MENU_LEFT
 noClipLeft:
-  cmp #207
+  cmp #TITLE_MENU_RIGHT-1
   bcc noClipRight
-  lda #207
+  lda #TITLE_MENU_RIGHT-1
 noClipRight:
   sta crosshairXHi+0
   rts
@@ -398,7 +416,7 @@ noClipRight:
   and #KEY_SELECT
   beq notSelect
   inx
-  cpx #4
+  cpx #TITLE_NUM_OPTIONS+1
   bcc notSelect
   ldx #1
 notSelect:
@@ -407,7 +425,7 @@ notSelect:
   and #KEY_DOWN
   beq notDown
   inx
-  cpx #4
+  cpx #TITLE_NUM_OPTIONS+1
   bcc notDown
   dex
 notDown:
@@ -451,17 +469,16 @@ noMouseCrosshair:
 
   ; Draw arrow for number of players
   lda numPlayers
-  asl a
-  asl a
-  asl a
-  asl a
-  adc #130
+  .repeat ::TITLE_OPTION_LOG_HT
+    asl a
+  .endrepeat
+  adc #TITLE_MENU_TOP+2
   sta OAM+0,x
   lda #SELECTED_ARROW_TILE
   sta OAM+1,x
   lda #1
   sta OAM+2,x
-  lda #76
+  lda #TITLE_ARROW_X
   sta OAM+3,x
   txa
   clc
@@ -579,6 +596,8 @@ mouse_icon_x:
   .byt 92, 140
 
 titlestrips:
+  ; start address
+
   ; Tops of "t" and "h"
   .dbyt $2128,$01F1
   .dbyt $212A,$01F2
@@ -598,4 +617,8 @@ titlestrips:
   .dbyt $22AD,$0672
   .dbyt $22CC,$066A
   .dbyt $22EC,$067A
+  .if WITH_EXIT_OPTION
+    .dbyt $230B,$044C
+    .dbyt $232B,$045C
+  .endif
 titlestripsend:

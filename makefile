@@ -21,8 +21,7 @@ AS65 = ca65
 LD65 = ld65
 #EMU := "/C/Program Files/nintendulator/Nintendulator.exe"
 #EMU := mednafen -nes.pal 0 -nes.input.port1 gamepad -nes.input.port2 gamepad
-DEBUGEMU := ~/.wine/drive_c/Program\ Files\ \(x86\)/FCEUX/fceux.exe
-DEBUGEMU2 := Mesen.exe
+DEBUGEMU := Mesen
 EMU := fceux
 CC := gcc
 CFLAGS := -std=gnu99 -Wall -Wextra -DNDEBUG -Os
@@ -50,8 +49,6 @@ run: $(title).nes
 	$(EMU) $<
 debug: $(title).nes
 	$(DEBUGEMU) $<
-debug2: $(title).nes
-	$(DEBUGEMU2) $<
 all: $(title).nes $(title)128.nes
 dist: zip
 zip: $(title)-$(version).zip
