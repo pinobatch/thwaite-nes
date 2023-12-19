@@ -7,12 +7,13 @@
 ; the copyright notice and this notice are preserved in all source
 ; code copies.  This file is offered as-is, without any warranty.
 ;
-.export read_pads, autorepeat
+.export read_pads
 .importzp cur_keys, new_keys, das_keys, das_timer
 
 JOY1      = $4016
 JOY2      = $4017
 
+USE_DAS = 0
 ; time until autorepeat starts making keypresses
 DAS_DELAY = 15
 ; time between autorepeat keypresses
@@ -69,6 +70,8 @@ read_pads_once:
   rts
 .endproc
 
+.if USE_DAS
+.export autorepeat
 ;;
 ; Computes autorepeat (delayed-auto-shift) on the gamepad for one
 ; player, ORing result into the player's new_keys.
@@ -94,3 +97,4 @@ no_restart_das:
 no_das:
   rts
 .endproc
+.endif

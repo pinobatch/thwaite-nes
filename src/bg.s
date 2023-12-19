@@ -58,6 +58,8 @@ housesStanding:  .res NUM_BUILDINGS
 buildingsDestroyedThisLevel: .res 1
 score100s: .res 1
 score1s: .res 1
+hiscore100s: .res 1
+hiscore1s: .res 1
 gameDay: .res 1
 gameHour: .res 1
 gameMinute: .res 1

@@ -84,7 +84,8 @@ BG_DIRTY_TIP = $04
 BG_DIRTY_PRACTICE_METER = $08
 
 ; bg fields
-.global housesStanding, houseX, houseShape, score1s, score100s
+.global housesStanding, houseX, houseShape
+.global score1s, score100s, hiscore1s, hiscore100s
 .global gameDay, gameHour, gameMinute, gameSecond, gameTenthSecond, gameSubTenth
 .global bgDirty, curTip, tipTimeLeft
 .global buildingsDestroyedThisLevel, firstDestroyedHouse, houseToRebuild

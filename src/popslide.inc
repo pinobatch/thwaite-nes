@@ -7,6 +7,9 @@ POPSLIDE_INC = 1
 popslide_buf = $0100
 POPSLIDE_SLACK = 8  ; for irq's sake
 
+NSTRIPE_DOWN = $80
+NSTRIPE_RUN = $40
+
 .global popslide_used
 
 ; popslide*.s methods
@@ -24,7 +27,6 @@ nstripe_left = $02
 nstripe_top = $03
 nstripe_width = $04
 nstripe_height = $05
-.global nstripe_draw_rect
 .global nstripe_append, nstripe_append_yhi, nstripe_append_tophi
 .global nstripe_append_src
 

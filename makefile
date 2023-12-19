@@ -13,7 +13,7 @@ version = 0.04
 objlist = popslide16 \
           main random levels smoke bg missiles explosion scurry \
           title practice cutscene dtescripts \
-          math bcd kinematics undte pads mouse ppuclear \
+          math bcd kinematics undte pads mouse ppuclear nstripe \
           paldetect pentlysound pentlymusic musicseq ntscPeriods
 
 CC65 = /usr/local/bin
@@ -89,7 +89,8 @@ map128.txt $(title)128.nes: nrom128.x $(objdir)/nrom128.o $(objlistntsc)
 
 # assembly language
 
-$(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/global.inc
+$(objdir)/%.o: $(srcdir)/%.s \
+  $(srcdir)/nes.inc $(srcdir)/global.inc $(srcdir)/popslide.inc
 	$(AS65) $(CFLAGS65) $< -o $@
 
 $(objdir)/%.o: $(objdir)/%.s

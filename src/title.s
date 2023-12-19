@@ -23,6 +23,7 @@
 
 .include "nes.inc"
 .include "global.inc"
+.include "popslide.inc"
 
 .global todo_txt
 
@@ -79,28 +80,36 @@ dstHi = $06
 .endproc
 
 .segment "CODE"
-.proc display_todo
+;;
+; Initializes Popslide, waits for vblank, turns off rendering, and
+; loads the title screen palette.
+
+.proc screen_off_title_palette
+  jsr popslide_init
+  ldx #>title_palette_stripe
+  lda #<title_palette_stripe
+  jsr nstripe_append
+  lda nmis
+  :
+    cmp nmis
+    beq :-
   lda #VBLANK_NMI
-  ldy #$3F
-  ldx #$00
   sta PPUCTRL
-  stx PPUMASK
-  sty PPUADDR
-  stx PPUADDR
-copypal:
-  lda title_palette,x
-  sta PPUDATA
-  inx
-  cpx #32
-  bcc copypal
+  asl a
+  sta PPUMASK
+  jmp popslide_terminate_blit
+.endproc
+
+.proc display_todo
+  jsr screen_off_title_palette
 
   ; clear nametable
-  ; ldx #$20
+  ldx #$20
   txa
-  ldy #$00
+  ldy #$FF
+  sty cur_keys+0
+  iny
   jsr ppu_clear_nt
-  ldx #$FF
-  stx cur_keys+0
 
   lda #>todo_txt
   sta 1
@@ -170,21 +179,10 @@ TITLE_MENU_BOTTOM = TITLE_MENU_TOP + ((TITLE_NUM_OPTIONS + 1) << TITLE_OPTION_LO
 
   ldx #1
   stx numPlayers
-  dex
-  lda #VBLANK_NMI
-  ldy #$3F
-  sta PPUCTRL
-  stx PPUMASK
-  sty PPUADDR
-  stx PPUADDR
+  lda #128
   sta crosshairYHi+0
   sta crosshairXHi+0
-copypal:
-  lda title_palette,x
-  sta PPUDATA
-  inx
-  cpx #32
-  bcc copypal
+  jsr screen_off_title_palette
 
   ldx #$04
   jsr ppu_clear_oam
@@ -217,22 +215,10 @@ copypal:
     bcc incstriploop
 
   ; The 1, 2, and P down the left side
-  ; sec
-  lda #VBLANK_NMI|VRAM_DOWN
-  sta PPUCTRL
-  lda #$22
-  sta PPUADDR
-  lda #$4B
-  sta PPUADDR
-  lda #$60  ; top of "1" tile
-  ldy #3
-  playercountloop:
-    sta PPUDATA
-    ora #$10
-    sta PPUDATA
-    sbc #$0F
-    dey
-    bne playercountloop
+  lda #<onetwop_stripe
+  ldx #>onetwop_stripe
+  jsr nstripe_append
+  jsr popslide_terminate_blit
 
 loop:
   jsr title_draw_sprites
@@ -480,10 +466,10 @@ noMouseCrosshair:
   sta OAM+2,x
   lda #TITLE_ARROW_X
   sta OAM+3,x
-  txa
-  clc
-  adc #4
-  tax
+  inx
+  inx
+  inx
+  inx
   
   ldy #1
 miceloop:
@@ -588,10 +574,14 @@ draw_mouse_player_y:
 ; obj2: red, green, peach (villagers)
 ; obj3: gray, orange, peach (villagers, smoke)
 
-title_palette:
-  .byt $0F,$00,$10,$20,$0F,$17,$16,$20,$0F,$17,$2A,$20,$0F,$17,$12,$20
+title_palette_stripe:
+  .dbyt $3F00
+  .byt 32-1
+  .byt $0F,$00,$10,$20, $0F,$17,$16,$20, $0F,$17,$2A,$20, $0F,$17,$12,$20
   ;    grayscale        arrow            mouse            sprite 0
-  .byt $0F,$00,$10,$30, $0F,$16,$27,$38, $0F,$00,$10,$13, $0F,$0F,$0F,$0F
+  .byt $0F,$00,$10,$20, $0F,$16,$27,$38, $0F,$00,$10,$13, $0F,$0F,$0F,$0F
+  .byt $FF
+
 mouse_icon_x:
   .byt 92, 140
 
@@ -621,4 +611,21 @@ titlestrips:
     .dbyt $230B,$044C
     .dbyt $232B,$045C
   .endif
+
 titlestripsend:
+
+onetwop_stripe:
+  .dbyt $224B
+  .byt (6-1)|NSTRIPE_DOWN
+  .byt $60,$70,$61,$71,$62,$72
+
+  .dbyt $2348
+  .byt (2-1)|NSTRIPE_RUN
+  .byt $40
+  .dbyt $2350
+  .byt (2-1)
+  .byt $30,$31  ; HI:
+  .dbyt $2358
+  .byt (2-1)|NSTRIPE_RUN
+  .byt $40
+  .byt $FF

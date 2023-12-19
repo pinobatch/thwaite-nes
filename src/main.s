@@ -40,8 +40,6 @@ debugHex1: .res 1
 debugHex2: .res 1
 cur_keys: .res 2
 new_keys: .res 2
-das_keys: .res 2
-das_timer: .res 2
 gameState: .res 1
 numPlayers: .res 1
 tvSystem: .res 1
@@ -132,6 +130,10 @@ clear_zp:
   .endif
   inx
   bne clear_zp
+  sta score100s
+  sta score1s
+  sta hiscore100s
+  sta hiscore1s
 
   jsr pently_init
   
