@@ -658,8 +658,6 @@ puthex:
   sta gameSecond
   sta gameTenthSecond
   sta gameSubTenth
-  sta score100s
-  sta score1s
   rts
 .endproc
 

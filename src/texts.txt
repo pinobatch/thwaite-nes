@@ -15,9 +15,9 @@ Side: Left  Right
 (Cancel)   (Play)
 
 == todo_txt ==
-Thwaite 0.04a
+Thwaite 0.04b
 
-© 2011,2020 Damian YERRICK
+© 2011,2023 Damian YERRICK
 <thwaite@pineight.com>
 
 Comes with ABSOLUTELY NO 

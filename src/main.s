@@ -64,6 +64,8 @@ FORCE_PARANOID = 0
 ; Always set to 0 for release builds.
 ONE_MISSILE_PER_LEVEL = 0
 
+STARTING_HISCORE = 2
+
 .segment "VECTORS"
   .addr nmi, reset, irq
 
@@ -132,8 +134,9 @@ clear_zp:
   bne clear_zp
   sta score100s
   sta score1s
-  sta hiscore100s
   sta hiscore1s
+  lda #STARTING_HISCORE
+  sta hiscore100s
 
   jsr pently_init
   
@@ -149,15 +152,16 @@ clear_zp:
 vwait2:
   bit PPUSTATUS
   bpl vwait2
-  
+
   lda #VBLANK_NMI
   sta PPUCTRL
-
   jsr getTVSystem
   sta tvSystem
-restart:
+  ; fall through to main
+.endproc
+
+.proc main
   jsr pently_stop_music
-  
   lda isPractice
   bne practice_skiptitle
   jsr titleScreen
@@ -176,7 +180,7 @@ practice_skiptitle:
   beq practice_skippracticemenu
   jsr practice_menu
   lda isPractice
-  beq restart
+  beq main
   bne practice_nocutscene
 practice_skippracticemenu:
 
@@ -188,11 +192,14 @@ practice_skippracticemenu:
     ldx #1
   .endif
   jsr cut_choose_villagers
-  
+
   lda #15  ; message from Pino before the game starts
   jsr load_cutscene
 practice_nocutscene:
 
+  lda #0  
+  sta score100s
+  sta score1s
   jsr setupGameBG
   jsr clearAllMissiles  ; and explosions, and smoke
   jsr initVillagers
@@ -278,7 +285,19 @@ drawAllCrosshairs:
   cmp #STATE_INACTIVE
   bne gameLoop
 
-  jmp restart
+  lda score1s
+  cmp hiscore1s
+  lda score100s
+  sbc hiscore100s
+  bcc :+
+    lda score1s
+    sta hiscore1s
+    lda score100s
+    sta hiscore100s
+  :
+  
+
+  jmp main
 .endproc
 
 ;;

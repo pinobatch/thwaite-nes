@@ -220,6 +220,16 @@ TITLE_MENU_BOTTOM = TITLE_MENU_TOP + ((TITLE_NUM_OPTIONS + 1) << TITLE_OPTION_LO
   jsr nstripe_append
   jsr popslide_terminate_blit
 
+  ; Draw last score
+  ldy #$62
+  ldx score100s
+  lda score1s
+  jsr title_draw_one_score
+  ldy #$78
+  ldx hiscore100s
+  lda hiscore1s
+  jsr title_draw_one_score
+
 loop:
   jsr title_draw_sprites
   lda nmis
@@ -563,6 +573,38 @@ draw_mouse_player_y:
   rts
 .endproc
 
+;;
+; Draws X hundreds and A ones to $2300+Y
+.proc title_draw_one_score
+highDigits = $00
+draw_digitbase = $01
+
+  pha
+  lda #$23
+  sta PPUADDR
+  sty PPUADDR
+  lda #$00
+  sta draw_digitbase
+  txa
+  jsr do2dig
+  pla
+do2dig:
+  jsr bcd8bit
+  pha
+  lda highDigits
+  jsr do1dig
+  pla
+do1dig:
+  beq :+
+    ldy #$40
+    sty draw_digitbase
+  :
+  ora draw_digitbase
+  sta PPUDATA
+  rts
+.endproc
+
+
 .segment "RODATA"
 ; backdrop: black
 ; bg0: dark gray, light gray, white
@@ -611,7 +653,6 @@ titlestrips:
     .dbyt $230B,$044C
     .dbyt $232B,$045C
   .endif
-
 titlestripsend:
 
 onetwop_stripe:
@@ -619,13 +660,13 @@ onetwop_stripe:
   .byt (6-1)|NSTRIPE_DOWN
   .byt $60,$70,$61,$71,$62,$72
 
-  .dbyt $2348
+  .dbyt $2366
   .byt (2-1)|NSTRIPE_RUN
   .byt $40
-  .dbyt $2350
+  .dbyt $2374
   .byt (2-1)
   .byt $30,$31  ; HI:
-  .dbyt $2358
+  .dbyt $237C
   .byt (2-1)|NSTRIPE_RUN
   .byt $40
   .byt $FF
