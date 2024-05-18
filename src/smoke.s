@@ -88,6 +88,7 @@ cancelSmoke:
   adc #NUM_SMOKE - 2
   tax
   ldy oam_used
+  beq oam_full
 smokeloop:
   ; set tile number if the particle is still active
   lda smokeTime,x
@@ -125,12 +126,12 @@ smokeloop:
   iny
   iny
   iny
-  beq bail
+  beq oam_full
 smokecontinue:
   dex
   dex
   bpl smokeloop
-bail:
+oam_full:
   sty oam_used
   rts
 .endproc

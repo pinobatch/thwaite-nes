@@ -263,7 +263,9 @@ drawAllCrosshairs:
   stx PPUMASK
 .endif  
   ldx oam_used
-  jsr ppu_clear_oam
+  beq oam_full
+    jsr ppu_clear_oam
+  oam_full:
   
   ; we're done preparing all updates
   lda nmis

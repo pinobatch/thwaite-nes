@@ -153,6 +153,7 @@ runExplosionFrame:
   adc explodeY,x
   sta exploY
   ldx oam_used
+  beq oam_full
   lda #0
   sta rowNum
   lda #$01
@@ -198,6 +199,7 @@ tileloop:
   inx
   inx
   inx
+  beq oam_full
 skipOneTile:
   iny
 .if ::EXPLOSION_XMIRROR
@@ -231,6 +233,7 @@ nosetyflip:
 .endif
   cmp tileSize
   bcc rowloop
+oam_full:
 
   ; now we're done drawing, so let's load the variables
   ; used for collision
