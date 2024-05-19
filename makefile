@@ -110,12 +110,8 @@ $(objdir)/main.o: $(objdir)/maingfx.chr $(objdir)/cuthouses.chr
 $(objdir)/ntscPeriods.s: tools/mktables.py
 	$(PY) $< period $@
 
-$(objdir)/cutscripts.s: tools/paginate.py \
-  $(srcdir)/cutscripts.txt
-	$(PY) tools/paginate.py \
-	-o $@
-
-$(objdir)/dtescripts.s: tools/paginate.py tools/dte$(DOTEXE) \
+$(objdir)/dtescripts.s: tools/paginate.py \
+  tools/charset.py tools/dte$(DOTEXE) \
   $(srcdir)/texts.txt $(srcdir)/tips.txt $(srcdir)/cutscripts.txt
 	$(PY) tools/paginate.py --dte \
 	-t cutscripts $(srcdir)/cutscripts.txt \

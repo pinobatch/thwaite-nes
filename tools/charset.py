@@ -7,16 +7,19 @@ import codecs
 # for DTE code units.
 name = 'thwaite'
 decoding_table = [
-    # Some ASCII control characters
+    # Reserve first 16 for ASCII control characters
     # 0x00 and 0x0a are for termination and newline respectively
-    *range(26),
-    # Ligatures I' and ll.  Abuses code points:
+    *range(16),
+    # Other ligatures as discovered to be needed
+    *range(16, 25),
+    # Ligatures 'r, I', and ll.  Abuses code points for ligatures:
+    # ŕ U+0155 LATIN SMALL LETTER R WITH ACUTE for r'
     # Í U+00CD LATIN CAPITAL LETTER I WITH ACUTE for I'
     # ỻ U+1EFB LATIN SMALL LETTER MIDDLE-WELSH LL for ll
-    0x00CD, 0x1EFB,
-    # copyright, rocket, 's, il.  Abuses code points:
-    # ś U+015B LATIN SMALL LETTER S WITH ACUTE for the "'s" ligature
-    # ǁ U+01C1 LATIN LETTER LATERAL CLICK for the "il" ligature
+    0x0155, 0x00CD, 0x1EFB,
+    # copyright, rocket, 's, il.  Abuses code points for ligatures:
+    # ś U+015B LATIN SMALL LETTER S WITH ACUTE for 's
+    # ǁ U+01C1 LATIN LETTER LATERAL CLICK for il
     0x00A9, 0x1F680, 0x015B, 0x01C1,
     # ASCII printable characters
     *range(32,127),
@@ -26,6 +29,9 @@ decoding_table = [
     # reserved for DTE
     *[0xFFFE]*128,
 ]
+
+# This one was considered and rejected for being used only once:
+# ḑ U+1E11 LATIN SMALL LETTER D WITH CEDILLA for 'd
 
 ### encoding map from decoding table
 
@@ -83,10 +89,13 @@ def register():
 ### Testing
 
 def preencode(s):
-    s = s.replace("il", "ǁ")
-    s = s.replace("'s", "ś")
+    """Convert ligatures into their presentation forms used with this encoding."""
+    # Narrow-narrow pairs have priority over apostrophe contractions
     s = s.replace("I'", "Í")
+    s = s.replace("il", "ǁ")
     s = s.replace("ll", "ỻ")
+    s = s.replace("'r", "ŕ")
+    s = s.replace("'s", "ś")
     return s
 
 def main():
