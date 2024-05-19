@@ -3,7 +3,7 @@ import codecs
 
 # Make a special character codepage mapping starting from ASCII printable
 # characters and adding special characters in non-whitespace ASCII control
-# characters. So that 128 of the 256 available characters can be used
+# characters $10-$1F.  This lets us use code units $80-$FF (128 of 256)
 # for DTE code units.
 name = 'thwaite'
 decoding_table = [

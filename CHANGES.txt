@@ -1,3 +1,10 @@
+Future
+* Don't flash all sprites when large quantities of explosions appear
+* Show last score and high score on title screen
+* Option for Exit on title screen, for multicart use
+* Add more ligatures: I', ll, 's, 'r
+* Integrate a faster DTE compressor by JRoatch
+
 0.04 (2018-10-19)
 * Chain certain initialization functions
 * Group functions into conceptual sections using a call graph
